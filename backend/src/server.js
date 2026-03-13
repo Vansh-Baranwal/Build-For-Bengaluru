@@ -31,10 +31,10 @@ app.use(cors({
 }));
 
 // Parse JSON request bodies
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
 
 // Parse URL-encoded request bodies
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 // HTTP request logging
 app.use(requestLogger);
