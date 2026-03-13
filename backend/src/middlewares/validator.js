@@ -19,10 +19,6 @@ const validateComplaintSubmission = [
   
   body('image_url')
     .optional()
-    .isURL()
-    .withMessage('Image URL must be a valid URL')
-    .matches(/\.(jpg|jpeg|png)$/i)
-    .withMessage('Image must be in jpg, jpeg, or png format')
 ];
 
 /**

@@ -1,6 +1,7 @@
 const db = require('../database/db');
 const aiService = require('../services/aiService');
 const newsService = require('../services/newsService');
+const storageService = require('../services/storageService');
 const geoUtils = require('../utils/geoUtils');
 const logger = require('../config/logger');
 const { NotFoundError, AIServiceError, DatabaseError } = require('../middlewares/errorHandler');
@@ -24,19 +25,26 @@ function mapSeverityToPriority(severity) {
  * POST /api/complaints
  */
 async function createComplaint(req, res, next) {
-  const { description, latitude, longitude, image_url } = req.body;
+  const { description, latitude, longitude } = req.body;
+  let imageUrl = req.body.image_url || null;
 
   try {
-    // Step 1: Analyze complaint using AI service
-    logger.debug('Analyzing complaint with AI service');
-    const aiAnalysis = await aiService.analyzeComplaint(description);
+    // Step 1: Handle image upload if a file is provided
+    if (req.file) {
+      logger.debug('Uploading file to storage');
+      imageUrl = await storageService.uploadImage(req.file);
+    }
+
+    // Step 2: Analyze complaint using AI service (with optional image)
+    logger.debug({ hasImage: !!imageUrl }, 'Analyzing complaint with AI service');
+    const aiAnalysis = await aiService.analyzeComplaint(description, imageUrl);
     const { category, severity, department } = aiAnalysis;
 
-    // Step 2: Map severity to priority
+    // Step 3: Map severity to priority
     const priority = mapSeverityToPriority(severity);
 
-    // Step 3: Insert complaint into database
-    logger.debug({ category, priority }, 'Inserting complaint into database');
+    // Step 4: Insert complaint into database
+    logger.debug({ category, priority, hasImage: !!imageUrl }, 'Inserting complaint into database');
     const insertQuery = `
       INSERT INTO complaints (
         user_id, description, category, priority, status, location, image_url
@@ -49,7 +57,7 @@ async function createComplaint(req, res, next) {
       RETURNING complaint_id, category, priority, status, created_at
     `;
 
-    // Extract user_id if the user is authenticated (added via authMiddleware if present route)
+    // Extract user_id if the user is authenticated
     const user_id = req.user ? req.user.user_id : null;
 
     const result = await db.query(insertQuery, [
@@ -59,7 +67,7 @@ async function createComplaint(req, res, next) {
       priority,
       longitude,
       latitude,
-      image_url || null
+      imageUrl
     ]);
 
     const complaint = result.rows[0];

@@ -84,12 +84,15 @@ export const api = {
 
   // ============ Complaint Endpoints ============
   
-  // Submit a new complaint (public endpoint)
-  async submitComplaint(data) {
+  // Submit a new complaint
+  async submitComplaint(formData) {
     const response = await fetch(`${API_BASE_URL}/complaints`, {
       method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data),
+      headers: {
+        ...getAuthHeaders(),
+        // Note: Don't set Content-Type for FormData, the browser adds boundary
+      },
+      body: formData,
     });
     
     return handleResponse(response);

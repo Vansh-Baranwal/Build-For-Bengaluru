@@ -1,5 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 const complaintController = require('../controllers/complaintController');
 const { 
@@ -33,6 +42,7 @@ const optionalAuthMiddleware = (req, res, next) => {
 router.post(
   '/complaints',
   optionalAuthMiddleware,
+  upload.single('image'), // Handle single file upload with field name 'image'
   complaintRateLimiter,
   validateComplaintSubmission,
   handleValidationErrors,

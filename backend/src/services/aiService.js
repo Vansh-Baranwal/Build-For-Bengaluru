@@ -3,7 +3,7 @@ const config = require('../config/env');
 const logger = require('../config/logger');
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = 'llama-3.3-70b-versatile'; // Updated from deprecated llama-3.1-70b-versatile
+const MODEL = 'llama-3.2-11b-vision-preview'; 
 
 // Valid categories for complaint classification
 const VALID_CATEGORIES = [
@@ -20,20 +20,22 @@ const VALID_CATEGORIES = [
 const VALID_SEVERITIES = ['low', 'medium', 'high'];
 
 /**
- * System prompt for AI complaint analysis
+ * System prompt for AI complaint analysis (Vision enabled)
  */
 const SYSTEM_PROMPT = `You are an AI assistant that analyzes civic infrastructure complaints and extracts structured information.
+You will be provided with a description and optionally an image of the issue.
 
-Your task is to analyze complaint descriptions and return a JSON object with the following fields:
+Your task is to analyze the evidence and return a JSON object with the following fields:
 - category: one of [pothole, garbage, flooding, water leak, streetlight failure, traffic signal issue, drainage]
 - severity: one of [low, medium, high]
 - department: the responsible government department (e.g., "Roads and Infrastructure", "Waste Management", "Water Supply")
 
-Guidelines:
-- Choose the most appropriate category based on the complaint description
-- Assess severity based on urgency, safety impact, and scale
-- Identify the department most likely responsible for addressing the issue
-- Return ONLY valid JSON, no additional text
+Extremely Important Guidelines:
+1. If an image is provided, PRIORITIZE visual evidence for severity. 
+   - A massive pothole or high-level flooding is "high" severity.
+   - A small garbage pile is "low", a massive dump is "medium" or "high".
+2. Choose the most appropriate category.
+3. Return ONLY valid JSON, no additional text.
 
 Example output:
 {
@@ -43,17 +45,34 @@ Example output:
 }`;
 
 /**
- * Analyze a complaint description using Groq API
+ * Analyze a complaint description (and optional image) using Groq Vision API
  * @param {string} description - The complaint description text
+ * @param {string} [imageUrl] - Optional public URL of the complaint image
  * @returns {Promise<Object>} Structured complaint data { category, severity, department }
  * @throws {Error} If AI processing fails
  */
-async function analyzeComplaint(description) {
+async function analyzeComplaint(description, imageUrl = null) {
   if (!description || typeof description !== 'string') {
     throw new Error('Invalid complaint description');
   }
 
   try {
+    const userContent = [
+      {
+        type: "text",
+        text: `Analyze this complaint and return JSON with category, severity, and department:\n\n"${description}"`
+      }
+    ];
+
+    if (imageUrl) {
+      userContent.push({
+        type: "image_url",
+        image_url: {
+          url: imageUrl
+        }
+      });
+    }
+
     const response = await axios.post(
       GROQ_API_URL,
       {
@@ -65,18 +84,18 @@ async function analyzeComplaint(description) {
           },
           {
             role: 'user',
-            content: `Analyze this complaint and return JSON with category, severity, and department:\n\n"${description}"`
+            content: userContent
           }
         ],
-        temperature: 0.3, // Lower temperature for more consistent results
-        max_tokens: 200
+        temperature: 0.1, // Lower temperature for even more precision
+        max_tokens: 300
       },
       {
         headers: {
           'Authorization': `Bearer ${config.groq.apiKey}`,
           'Content-Type': 'application/json'
         },
-        timeout: 10000 // 10 second timeout
+        timeout: 15000 // Increased timeout for vision
       }
     );
 
@@ -90,7 +109,6 @@ async function analyzeComplaint(description) {
     // Parse JSON response
     let parsedData;
     try {
-      // Try to extract JSON from the response (in case there's extra text)
       const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         parsedData = JSON.parse(jsonMatch[0]);
@@ -126,23 +144,13 @@ async function analyzeComplaint(description) {
     };
 
   } catch (error) {
-    // Handle different error types
     if (error.response) {
-      // Groq API returned an error response
       logger.error({ 
         status: error.response.status, 
         data: error.response.data 
       }, 'Groq API error');
       throw new Error(`AI processing failure: ${error.response.data.error?.message || 'Unknown error'}`);
-    } else if (error.request) {
-      // Request was made but no response received
-      logger.error('Groq API timeout or network error');
-      throw new Error('AI service unavailable - network error');
-    } else if (error.message.includes('Invalid JSON')) {
-      // JSON parsing error
-      throw new Error('AI processing failure: Invalid response format');
     } else {
-      // Other errors
       logger.error({ error }, 'AI service error');
       throw new Error(`AI processing failure: ${error.message}`);
     }

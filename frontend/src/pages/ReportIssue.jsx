@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Send } from 'lucide-react';
+import { MapPin, Send, Image, X, Upload } from 'lucide-react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -54,6 +54,8 @@ export default function ReportIssue() {
   const [position, setPosition] = useState(null);
   const [loading, setLoading] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -97,7 +99,26 @@ export default function ReportIssue() {
       }
     );
   };
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size must be less than 5MB');
+        return;
+      }
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
+  const removeImage = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -108,14 +129,17 @@ export default function ReportIssue() {
 
     try {
       setLoading(true);
-      const data = {
-        description: formData.description,
-        latitude: parseFloat(formData.latitude),
-        longitude: parseFloat(formData.longitude),
-        image_url: formData.image_url || undefined,
-      };
+      
+      const formDataToSend = new FormData();
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('latitude', formData.latitude);
+      formDataToSend.append('longitude', formData.longitude);
+      
+      if (selectedFile) {
+        formDataToSend.append('image', selectedFile);
+      }
 
-      const result = await api.submitComplaint(data);
+      const result = await api.submitComplaint(formDataToSend);
       toast.success(`Complaint submitted successfully! ID: ${result.complaint_id}`);
       
       // Reset form
@@ -125,6 +149,8 @@ export default function ReportIssue() {
         longitude: '',
         image_url: '',
       });
+      setSelectedFile(null);
+      setPreviewUrl(null);
       setPosition(null);
     } catch (error) {
       toast.error(error.message || 'Failed to submit complaint');
@@ -237,22 +263,52 @@ export default function ReportIssue() {
             <span>{gettingLocation ? 'Getting location...' : 'Use My Location'}</span>
           </button>
 
-          {/* Image URL */}
+          {/* Image Upload */}
           <div>
-            <label htmlFor="image_url" className="block text-sm font-medium text-gray-700 mb-2">
-              Image URL (Optional)
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Upload Evidence Image (Optional)
             </label>
-            <input
-              type="url"
-              id="image_url"
-              name="image_url"
-              value={formData.image_url}
-              onChange={handleChange}
-              placeholder="https://example.com/image.jpg"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Supported formats: .jpg, .jpeg, .png
+            
+            {!previewUrl ? (
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-400 transition-colors bg-gray-50 group cursor-pointer relative">
+                <div className="space-y-1 text-center">
+                  <Upload className="mx-auto h-12 w-12 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                  <div className="flex text-sm text-gray-600">
+                    <label className="relative cursor-pointer bg-transparent rounded-md font-medium text-blue-600 hover:text-blue-500">
+                      <span>Upload a file</span>
+                      <input 
+                        type="file" 
+                        className="sr-only" 
+                        accept="image/*" 
+                        onChange={handleFileChange}
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    PNG, JPG, JPEG up to 5MB
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="relative inline-block mt-1">
+                <img 
+                  src={previewUrl} 
+                  alt="Preview" 
+                  className="h-40 w-full object-cover rounded-lg border border-gray-200"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-md hover:bg-red-600 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+            <p className="text-xs text-blue-600 mt-2 flex items-center">
+              <Image className="w-3 h-3 mr-1" />
+              AI will analyze the image to judge severity and priority automatically.
             </p>
           </div>
 
