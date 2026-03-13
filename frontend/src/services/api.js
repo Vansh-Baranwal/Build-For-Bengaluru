@@ -163,4 +163,16 @@ export const api = {
     
     return handleResponse(response);
   },
+
+  // Get city news (public endpoint)
+  async getCityNews() {
+    const response = await fetch(`${API_BASE_URL}/news`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    return handleResponse(response);
+  },
 };

@@ -6,6 +6,7 @@ import { Newspaper, TrendingUp, MapPin } from 'lucide-react';
 
 const NewsDashboard = () => {
   const [trendingIssues, setTrendingIssues] = useState([]);
+  const [news, setNews] = useState([]);
   const [heatmapData, setHeatmapData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -13,12 +14,14 @@ const NewsDashboard = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [trending, heatmap] = await Promise.all([
+        const [trending, heatmap, newsData] = await Promise.all([
           api.getTrendingIssues(),
           api.getHeatmapData(),
+          api.getCityNews()
         ]);
         setTrendingIssues(trending);
         setHeatmapData(heatmap);
+        setNews(newsData || []);
       } catch (error) {
         console.error('Error fetching data:', error);
         toast.error('Failed to load dashboard data');
@@ -127,6 +130,47 @@ const NewsDashboard = () => {
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Live City News */}
+        <div className="mt-8 bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+            <Newspaper className="h-5 w-5 mr-2 text-purple-600" />
+            Live Bengaluru Civic News
+          </h2>
+          
+          {news.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">
+              No recent news articles found
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {news.map((article, idx) => (
+                <a 
+                  key={idx} 
+                  href={article.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors flex flex-col"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs font-semibold text-purple-600">
+                      {article.source}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {new Date(article.publishedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
+                    {article.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {article.description}
+                  </p>
+                </a>
               ))}
             </div>
           )}

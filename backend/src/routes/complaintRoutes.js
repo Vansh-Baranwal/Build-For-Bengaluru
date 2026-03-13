@@ -105,4 +105,11 @@ router.get('/trending', complaintController.getTrending);
  */
 router.get('/heatmap', complaintController.getHeatmapData);
 
+/**
+ * GET /api/news
+ * Get city news related to civic infrastructure
+ * - Public endpoint
+ */
+router.get('/news', complaintController.getCityNews);
+
 module.exports = router;

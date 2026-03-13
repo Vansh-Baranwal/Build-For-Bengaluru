@@ -1,5 +1,6 @@
 const db = require('../database/db');
 const aiService = require('../services/aiService');
+const newsService = require('../services/newsService');
 const geoUtils = require('../utils/geoUtils');
 const logger = require('../config/logger');
 const { NotFoundError, AIServiceError, DatabaseError } = require('../middlewares/errorHandler');
@@ -302,6 +303,21 @@ async function getMyComplaints(req, res, next) {
   }
 }
 
+/**
+ * Get city news related to civic issues
+ * GET /api/news
+ */
+async function getCityNews(req, res, next) {
+  try {
+    const news = await newsService.fetchCityNews();
+    res.status(200).json(news);
+  } catch (error) {
+    logger.error({ error }, 'Error retrieving city news');
+    // We don't want to break the app if news fails, so return empty array
+    res.status(200).json([]);
+  }
+}
+
 module.exports = {
   createComplaint,
   getComplaint,
@@ -309,5 +325,6 @@ module.exports = {
   getMyComplaints,
   updateComplaintStatus,
   getTrending,
-  getHeatmapData
+  getHeatmapData,
+  getCityNews
 };
