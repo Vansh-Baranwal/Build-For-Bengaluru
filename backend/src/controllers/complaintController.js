@@ -72,7 +72,15 @@ async function createComplaint(req, res, next) {
     if (req.files && req.files.image) {
       logger.debug('Uploading image file to storage');
       const imageFile = req.files.image[0];
-      imageUrl = await storageService.uploadImage(imageFile);
+      try {
+        imageUrl = await storageService.uploadImage(imageFile);
+      } catch (storageError) {
+        logger.error({ 
+          error: storageError.message,
+          filename: imageFile.originalname 
+        }, 'Image upload failed, proceeding without image');
+        // We continue because we still want to save the complaint
+      }
     }
 
     // Step 2: Analyze complaint using AI service (with optional image)
