@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -30,7 +31,11 @@ const getMarkerIcon = (category) => {
 
   return L.divIcon({
     className: 'custom-marker',
-    html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+    html: `
+      <div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+        <div style="background-color: white; width: 8px; height: 8px; border-radius: 50%;"></div>
+      </div>
+    `,
     iconSize: [24, 24],
     iconAnchor: [12, 12],
   });
@@ -76,30 +81,36 @@ export default function CityMap() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {/* Complaint Markers */}
-          {complaints.map((complaint, index) => (
-            <Marker
-              key={index}
-              position={[complaint.latitude, complaint.longitude]}
-              icon={getMarkerIcon(complaint.category)}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-semibold text-gray-900 capitalize mb-2">
-                    {complaint.category}
-                  </h3>
-                  <div className="space-y-1">
-                    <div>
-                      <PriorityBadge priority={complaint.priority} />
+          {/* Complaint Markers with Clustering */}
+          <MarkerClusterGroup
+            chunkedLoading
+            maxClusterRadius={40}
+            showCoverageOnHover={false}
+          >
+            {complaints.map((complaint, index) => (
+              <Marker
+                key={index}
+                position={[complaint.latitude, complaint.longitude]}
+                icon={getMarkerIcon(complaint.category)}
+              >
+                <Popup>
+                  <div className="p-2">
+                    <h3 className="font-semibold text-gray-900 capitalize mb-2">
+                      {complaint.category}
+                    </h3>
+                    <div className="space-y-1">
+                      <div>
+                        <PriorityBadge priority={complaint.priority} />
+                      </div>
+                      <p className="text-xs text-gray-600">
+                        Location: {complaint.latitude.toFixed(4)}, {complaint.longitude.toFixed(4)}
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-600">
-                      Location: {complaint.latitude.toFixed(4)}, {complaint.longitude.toFixed(4)}
-                    </p>
                   </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+                </Popup>
+              </Marker>
+            ))}
+          </MarkerClusterGroup>
 
           {/* Heatmap circles for density visualization */}
           {complaints.map((complaint, index) => (
