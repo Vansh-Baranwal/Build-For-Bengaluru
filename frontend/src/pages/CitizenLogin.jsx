@@ -71,7 +71,7 @@ const CitizenLogin = () => {
     setIsSubmitting(true);
 
     try {
-      await login(formData.email, formData.password);
+      await login(formData.email, formData.password, 'citizen');
     } catch (error) {
       setServerError(error.message || 'Login failed. Please try again.');
     } finally {

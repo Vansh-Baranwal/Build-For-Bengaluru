@@ -61,9 +61,14 @@ export const AuthProvider = ({ children }) => {
     navigate('/');
   };
 
-  const login = async (email, password) => {
+  const login = async (email, password, expectedRole = null) => {
     try {
       const response = await api.login(email, password);
+      
+      // Enforce role-based login portals to prevent confusion
+      if (expectedRole && response.user.role !== expectedRole) {
+        throw new Error(`Access denied. You have a ${response.user.role} account. Please use the correct login portal.`);
+      }
       
       // Store token
       storeToken(response.token);

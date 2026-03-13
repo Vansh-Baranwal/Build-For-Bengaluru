@@ -71,7 +71,7 @@ const NewsLogin = () => {
     setIsSubmitting(true);
 
     try {
-      await login(formData.email, formData.password);
+      await login(formData.email, formData.password, 'news');
     } catch (error) {
       setServerError(error.message || 'Login failed. Please try again.');
     } finally {

@@ -71,7 +71,7 @@ const GovernmentLogin = () => {
     setIsSubmitting(true);
 
     try {
-      await login(formData.email, formData.password);
+      await login(formData.email, formData.password, 'government');
     } catch (error) {
       setServerError(error.message || 'Login failed. Please try again.');
     } finally {
