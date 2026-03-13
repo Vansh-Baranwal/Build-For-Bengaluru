@@ -32,12 +32,19 @@ function App() {
             
             <main className="flex-1 overflow-auto">
               <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/report" element={<ReportIssue />} />
-                <Route path="/track" element={<TrackComplaint />} />
-                <Route path="/map" element={<CityMap />} />
-                <Route path="/trending" element={<TrendingIssues />} />
+                {/* Public / Landing Routes */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/report" element={<ProtectedRoute><ReportIssue /></ProtectedRoute>} />
+                <Route path="/track" element={<ProtectedRoute><TrackComplaint /></ProtectedRoute>} />
+                <Route path="/map" element={<ProtectedRoute><CityMap /></ProtectedRoute>} />
+                <Route path="/trending" element={<ProtectedRoute><TrendingIssues /></ProtectedRoute>} />
                 
                 {/* Authentication Routes - Three Separate Login Pages */}
                 <Route path="/login/citizen" element={<CitizenLogin />} />
