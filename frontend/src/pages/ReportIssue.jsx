@@ -1,8 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Send } from 'lucide-react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css'; // Add this to ensure leaflet styles are loaded if they weren't already
+
+// Fix for default marker icons in React-Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Component to recenter the map when the position state changes externally
+function MapUpdater({ position }) {
+  const map = useMap();
+  useEffect(() => {
+    if (position) {
+      map.flyTo(position, map.getZoom());
+    }
+  }, [position, map]);
+  return null;
+}
+
+// Component to handle clicks on the map to place a pin
+function LocationMarker({ position, setPosition, setFormData }) {
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+      setFormData(prev => ({
+        ...prev,
+        latitude: e.latlng.lat,
+        longitude: e.latlng.lng,
+      }));
+    },
+  });
+
+  return position === null ? null : (
+    <Marker position={position}></Marker>
+  );
+}
 
 export default function ReportIssue() {
   const [formData, setFormData] = useState({
@@ -11,14 +51,24 @@ export default function ReportIssue() {
     longitude: '',
     image_url: '',
   });
+  const [position, setPosition] = useState(null);
   const [loading, setLoading] = useState(false);
   const [gettingLocation, setGettingLocation] = useState(false);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+
+    if (name === 'latitude' || name === 'longitude') {
+      const newLat = name === 'latitude' ? parseFloat(value) : parseFloat(formData.latitude);
+      const newLng = name === 'longitude' ? parseFloat(value) : parseFloat(formData.longitude);
+      if (!isNaN(newLat) && !isNaN(newLng)) {
+        setPosition({ lat: newLat, lng: newLng });
+      }
+    }
   };
 
   const handleGetLocation = () => {
@@ -29,12 +79,15 @@ export default function ReportIssue() {
 
     setGettingLocation(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
         setFormData({
           ...formData,
-          latitude: position.coords.latitude.toString(),
-          longitude: position.coords.longitude.toString(),
+          latitude: lat,
+          longitude: lng,
         });
+        setPosition({ lat, lng });
         toast.success('Location captured successfully');
         setGettingLocation(false);
       },
@@ -72,6 +125,7 @@ export default function ReportIssue() {
         longitude: '',
         image_url: '',
       });
+      setPosition(null);
     } catch (error) {
       toast.error(error.message || 'Failed to submit complaint');
     } finally {
@@ -108,7 +162,36 @@ export default function ReportIssue() {
             </p>
           </div>
 
-          {/* Location */}
+          {/* Interactive Map */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Pinpoint Location on Map *
+            </label>
+            <div className="h-64 w-full rounded-lg overflow-hidden border border-gray-300 relative z-0">
+              <MapContainer
+                center={[12.9716, 77.5946]}
+                zoom={12}
+                className="h-full w-full"
+                zoomControl={true}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <LocationMarker 
+                  position={position} 
+                  setPosition={setPosition} 
+                  setFormData={setFormData}
+                />
+                <MapUpdater position={position} />
+              </MapContainer>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Click anywhere on the map to set the exact coordinates of the issue.
+            </p>
+          </div>
+
+          {/* Location Inputs (Auto-filled by map) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="latitude" className="block text-sm font-medium text-gray-700 mb-2">
@@ -122,7 +205,7 @@ export default function ReportIssue() {
                 value={formData.latitude}
                 onChange={handleChange}
                 placeholder="12.9716"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                 required
               />
             </div>
@@ -138,7 +221,7 @@ export default function ReportIssue() {
                 value={formData.longitude}
                 onChange={handleChange}
                 placeholder="77.5946"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                 required
               />
             </div>
