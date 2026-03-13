@@ -189,8 +189,8 @@ async function getTrending(req, res, next) {
       SELECT 
         cluster_id,
         issue_type,
-        ST_Y(location::geometry) as latitude,
-        ST_X(location::geometry) as longitude,
+        latitude,
+        longitude,
         complaint_count
       FROM clusters
       ORDER BY complaint_count DESC
