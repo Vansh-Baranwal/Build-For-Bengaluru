@@ -58,6 +58,32 @@ async function login(req, res, next) {
   try {
     const { email, password } = req.body;
 
+    // Hardcoded Admin Login for Government Officials
+    if (email === 'admin' && password === 'admin123') {
+      logger.info('Hardcoded admin logged in');
+      
+      const adminToken = jwt.sign(
+        {
+          user_id: '00000000-0000-0000-0000-000000000000', // Virtual UUID for admin
+          role: 'government',
+          email: 'admin'
+        },
+        config.jwt.secret,
+        { expiresIn: config.jwt.expiresIn }
+      );
+
+      return res.status(200).json({
+        token: adminToken,
+        role: 'government',
+        user: {
+          user_id: '00000000-0000-0000-0000-000000000000',
+          name: 'NammaFix Administrator',
+          email: 'admin',
+          role: 'government'
+        }
+      });
+    }
+
     // Find user by email
     const result = await db.query(
       'SELECT user_id, name, email, password_hash, role FROM public.users WHERE email = $1',

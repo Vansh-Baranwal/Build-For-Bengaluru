@@ -100,11 +100,12 @@ async function createComplaint(req, res, next) {
       aiAnalysis = {
         category: 'garbage',
         severity: 'medium',
-        department: 'General Services'
+        department_group: 'Cleaning Work',
+        issue_type: 'Regular Problem'
       };
     }
     
-    const { category, severity, department } = aiAnalysis;
+    const { category, severity, department_group, issue_type } = aiAnalysis;
 
     // Step 3: Map severity to priority
     const priority = mapSeverityToPriority(severity);
@@ -113,14 +114,14 @@ async function createComplaint(req, res, next) {
     logger.debug({ category, priority, hasImage: !!imageUrl }, 'Inserting complaint into database');
     const insertQuery = `
       INSERT INTO complaints (
-        user_id, description, category, priority, status, location, image_url
+        user_id, description, category, priority, status, location, image_url, department_group, issue_type
       )
       VALUES (
         $1, $2, $3, $4, 'pending', 
         ST_SetSRID(ST_MakePoint($5, $6), 4326)::geography,
-        $7
+        $7, $8, $9
       )
-      RETURNING complaint_id, category, priority, status, created_at
+      RETURNING complaint_id, category, priority, status, created_at, department_group, issue_type
     `;
 
     // Extract user_id if the user is authenticated
@@ -133,7 +134,9 @@ async function createComplaint(req, res, next) {
       priority,
       lng, // longitude
       lat, // latitude
-      imageUrl
+      imageUrl,
+      department_group,
+      issue_type
     ]);
 
     const complaint = result.rows[0];
@@ -323,9 +326,13 @@ async function getAllComplaints(req, res, next) {
     const query = `
       SELECT 
         complaint_id,
+        description,
         category,
         priority,
         status,
+        department_group,
+        issue_type,
+        image_url,
         ST_Y(location::geometry) as latitude,
         ST_X(location::geometry) as longitude,
         created_at,
@@ -355,9 +362,13 @@ async function getMyComplaints(req, res, next) {
     const query = `
       SELECT 
         complaint_id,
+        description,
         category,
         priority,
         status,
+        department_group,
+        issue_type,
+        image_url,
         ST_Y(location::geometry) as latitude,
         ST_X(location::geometry) as longitude,
         created_at,

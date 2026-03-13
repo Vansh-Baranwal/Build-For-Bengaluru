@@ -4,18 +4,23 @@ const logger = require('../config/logger');
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_AUDIO_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
-const MODEL = 'llama-3.2-11b-vision-preview'; 
+const MODEL = 'llama-3.3-70b-versatile'; 
 const WHISPER_MODEL = 'whisper-large-v3';
 
-// Valid categories for complaint classification
-const VALID_CATEGORIES = [
-  'pothole',
-  'garbage',
-  'flooding',
-  'water leak',
-  'streetlight failure',
-  'traffic signal issue',
-  'drainage'
+// Valid departmental groups for government routing
+const VALID_DEPARTMENTS = [
+  'BBMP',
+  'Traffic Police',
+  'Cleaning Work',
+  'Others'
+];
+
+// Valid issue types for internal prioritization
+const VALID_ISSUE_TYPES = [
+  'Emergency',
+  'Recurring',
+  'Regular Problem',
+  'Trends'
 ];
 
 // Valid severity levels
@@ -24,26 +29,37 @@ const VALID_SEVERITIES = ['low', 'medium', 'high'];
 /**
  * System prompt for AI complaint analysis (Vision enabled)
  */
-const SYSTEM_PROMPT = `You are an AI assistant that analyzes civic infrastructure complaints and extracts structured information.
+const SYSTEM_PROMPT = `You are an AI assistant that analyzes civic infrastructure complaints and extracts structured information for government officials.
 You will be provided with a description and optionally an image of the issue.
 
 Your task is to analyze the evidence and return a JSON object with the following fields:
-- category: one of [pothole, garbage, flooding, water leak, streetlight failure, traffic signal issue, drainage]
+- category: The specific type of issue (e.g., "pothole", "garbage dump", "broken signal")
 - severity: one of [low, medium, high]
-- department: the responsible government department (e.g., "Roads and Infrastructure", "Waste Management", "Water Supply")
+- department_group: one of [BBMP, Traffic Police, Cleaning Work, Others]
+- issue_type: one of [Emergency, Recurring, Regular Problem, Trends]
+
+Classification Logic:
+1. BBMP: Roads, structural issues, construction, illegal buildings, water/drainage.
+2. Traffic Police: Anything related to vehicle movement, signals, parking, or accidents.
+3. Cleaning Work: Garbage collection, sewage overflow, animal carcasses, public toilets.
+4. Others: Any civic issue not fitting above.
+
+Issue Type Logic:
+- Emergency: Life-threatening or major infrastructure collapse (floods, live wires, deep potholes on main roads).
+- Recurring: Issues that sound like they happen often (e.g., "this signal is broken again", "garbage always piles up here").
+- Trends: Widespread issues mentioned as affecting many people or a whole area.
+- Regular Problem: Standard single occurrences.
 
 Extremely Important Guidelines:
 1. If an image is provided, PRIORITIZE visual evidence for severity. 
-   - A massive pothole or high-level flooding is "high" severity.
-   - A small garbage pile is "low", a massive dump is "medium" or "high".
-2. Choose the most appropriate category.
-3. Return ONLY valid JSON, no additional text.
+2. Return ONLY valid JSON, no additional text.
 
 Example output:
 {
   "category": "pothole",
   "severity": "high",
-  "department": "Roads and Infrastructure"
+  "department_group": "BBMP",
+  "issue_type": "Emergency"
 }`;
 
 /**
@@ -127,14 +143,20 @@ async function analyzeComplaint(description, imageUrl = null) {
     }
 
     // Validate the response structure
-    if (!parsedData.category || !parsedData.severity || !parsedData.department) {
+    if (!parsedData.department_group || !parsedData.severity || !parsedData.issue_type) {
       throw new Error('AI response missing required fields');
     }
 
-    // Validate category
-    if (!VALID_CATEGORIES.includes(parsedData.category)) {
-      logger.warn({ category: parsedData.category }, 'Invalid category from AI, using default');
-      parsedData.category = 'garbage'; // Default fallback
+    // Validate department_group
+    if (!VALID_DEPARTMENTS.includes(parsedData.department_group)) {
+      logger.warn({ department_group: parsedData.department_group }, 'Invalid department_group from AI, using default');
+      parsedData.department_group = 'Others';
+    }
+
+    // Validate issue_type
+    if (!VALID_ISSUE_TYPES.includes(parsedData.issue_type)) {
+      logger.warn({ issue_type: parsedData.issue_type }, 'Invalid issue_type from AI, using default');
+      parsedData.issue_type = 'Regular Problem';
     }
 
     // Validate severity
@@ -144,9 +166,10 @@ async function analyzeComplaint(description, imageUrl = null) {
     }
 
     return {
-      category: parsedData.category,
+      category: parsedData.category || 'general',
       severity: parsedData.severity,
-      department: parsedData.department
+      department_group: parsedData.department_group,
+      issue_type: parsedData.issue_type
     };
 
   } catch (error) {
@@ -204,6 +227,7 @@ async function transcribeAudio(audioBuffer, filename) {
 module.exports = {
   analyzeComplaint,
   transcribeAudio,
-  VALID_CATEGORIES,
+  VALID_DEPARTMENTS,
+  VALID_ISSUE_TYPES,
   VALID_SEVERITIES
 };
