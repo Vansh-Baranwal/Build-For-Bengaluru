@@ -3,7 +3,7 @@ const config = require('../config/env');
 const logger = require('../config/logger');
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = 'llama-3.1-70b-versatile';
+const MODEL = 'llama-3.3-70b-versatile'; // Updated from deprecated llama-3.1-70b-versatile
 
 // Valid categories for complaint classification
 const VALID_CATEGORIES = [
