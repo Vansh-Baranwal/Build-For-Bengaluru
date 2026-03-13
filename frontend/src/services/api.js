@@ -1,3 +1,4 @@
+// Use deployed backend API
 const API_BASE_URL = 'https://build-for-bengaluru.onrender.com/api';
 
 export const api = {

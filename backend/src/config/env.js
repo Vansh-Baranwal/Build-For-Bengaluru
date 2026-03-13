@@ -34,6 +34,10 @@ module.exports = {
   groq: {
     apiKey: process.env.GROQ_API_KEY
   },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+    expiresIn: '7d'
+  },
   server: {
     port: process.env.PORT || 3000,
     nodeEnv: process.env.NODE_ENV || 'development'

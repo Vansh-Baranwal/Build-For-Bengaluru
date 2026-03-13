@@ -100,7 +100,7 @@ export default function ReportIssue() {
               value={formData.description}
               onChange={handleChange}
               placeholder="Describe the issue in detail (10-500 characters)..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -122,7 +122,7 @@ export default function ReportIssue() {
                 value={formData.latitude}
                 onChange={handleChange}
                 placeholder="12.9716"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
             </div>
@@ -138,7 +138,7 @@ export default function ReportIssue() {
                 value={formData.longitude}
                 onChange={handleChange}
                 placeholder="77.5946"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               />
             </div>
@@ -166,7 +166,7 @@ export default function ReportIssue() {
               value={formData.image_url}
               onChange={handleChange}
               placeholder="https://example.com/image.jpg"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <p className="text-xs text-gray-500 mt-1">
               Supported formats: .jpg, .jpeg, .png

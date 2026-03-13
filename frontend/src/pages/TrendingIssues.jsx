@@ -32,7 +32,7 @@ export default function TrendingIssues() {
     <div className="p-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-          <TrendingUp className="w-8 h-8 mr-3 text-primary-600" />
+          <TrendingUp className="w-8 h-8 mr-3 text-blue-600" />
           Trending Issues
         </h1>
         <p className="text-gray-600 mt-1">Complaint clusters sorted by frequency</p>

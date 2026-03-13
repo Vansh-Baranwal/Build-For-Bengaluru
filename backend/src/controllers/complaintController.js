@@ -235,9 +235,40 @@ async function getHeatmapData(req, res, next) {
   }
 }
 
+/**
+ * Get all complaints (Government only)
+ * GET /api/complaints
+ */
+async function getAllComplaints(req, res, next) {
+  try {
+    const query = `
+      SELECT 
+        complaint_id,
+        category,
+        priority,
+        status,
+        ST_Y(location::geometry) as latitude,
+        ST_X(location::geometry) as longitude,
+        created_at,
+        updated_at
+      FROM complaints
+      ORDER BY created_at DESC
+    `;
+
+    const result = await db.query(query);
+
+    res.status(200).json(result.rows);
+
+  } catch (error) {
+    logger.error({ error }, 'Error retrieving all complaints');
+    return next(new DatabaseError('Failed to retrieve complaints'));
+  }
+}
+
 module.exports = {
   createComplaint,
   getComplaint,
+  getAllComplaints,
   updateComplaintStatus,
   getTrending,
   getHeatmapData

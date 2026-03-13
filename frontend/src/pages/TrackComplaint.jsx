@@ -57,7 +57,7 @@ export default function TrackComplaint() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center space-x-2 bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
+            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
             <Search className="w-5 h-5" />
             <span>Search</span>
@@ -129,9 +129,9 @@ export default function TrackComplaint() {
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
                           isCompleted
-                            ? 'bg-primary-600 border-primary-600'
+                            ? 'bg-blue-600 border-blue-600'
                             : 'bg-white border-gray-300'
-                        } ${isCurrent ? 'ring-4 ring-primary-100' : ''}`}
+                        } ${isCurrent ? 'ring-4 ring-blue-100' : ''}`}
                       >
                         {isCompleted ? (
                           <CheckCircle2 className="w-6 h-6 text-white" />
@@ -141,7 +141,7 @@ export default function TrackComplaint() {
                       </div>
                       <p
                         className={`text-xs mt-2 font-medium capitalize ${
-                          isCompleted ? 'text-primary-600' : 'text-gray-500'
+                          isCompleted ? 'text-blue-600' : 'text-gray-500'
                         }`}
                       >
                         {step.replace('_', ' ')}
@@ -150,7 +150,7 @@ export default function TrackComplaint() {
                     {index < 2 && (
                       <div
                         className={`h-0.5 flex-1 ${
-                          index < currentStep ? 'bg-primary-600' : 'bg-gray-300'
+                          index < currentStep ? 'bg-blue-600' : 'bg-gray-300'
                         }`}
                       />
                     )}
