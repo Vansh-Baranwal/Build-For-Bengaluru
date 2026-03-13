@@ -118,8 +118,12 @@ async function analyzeComplaint(description, imageUrl = null) {
         parsedData = JSON.parse(aiContent);
       }
     } catch (parseError) {
-      logger.error({ aiContent, parseError }, 'Failed to parse AI response');
-      throw new Error('Invalid JSON response from AI service');
+      logger.error({ 
+        aiContent, 
+        parseError: parseError.message,
+        errorExcerpt: aiContent.substring(0, 100)
+      }, 'Failed to parse AI response');
+      throw new Error(`Invalid JSON response from AI service: ${parseError.message}`);
     }
 
     // Validate the response structure

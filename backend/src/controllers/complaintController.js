@@ -77,7 +77,25 @@ async function createComplaint(req, res, next) {
 
     // Step 2: Analyze complaint using AI service (with optional image)
     logger.debug({ hasImage: !!imageUrl }, 'Analyzing complaint with AI service');
-    const aiAnalysis = await aiService.analyzeComplaint(description, imageUrl);
+    
+    let aiAnalysis;
+    try {
+      aiAnalysis = await aiService.analyzeComplaint(description, imageUrl);
+    } catch (aiError) {
+      logger.error({ 
+        error: aiError.message, 
+        description: description.substring(0, 50),
+        hasImage: !!imageUrl
+      }, 'AI Analysis failed, using fallbacks');
+      
+      // Fallback values so the complaint still gets saved
+      aiAnalysis = {
+        category: 'garbage',
+        severity: 'medium',
+        department: 'General Services'
+      };
+    }
+    
     const { category, severity, department } = aiAnalysis;
 
     // Step 3: Map severity to priority
