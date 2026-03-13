@@ -4,14 +4,17 @@ import StatCard from '../components/StatCard';
 import AlertBanner from '../components/AlertBanner';
 import LoadingSpinner from '../components/LoadingSpinner';
 import CityNews from '../components/CityNews';
+import ValidationWidget from '../components/ValidationWidget';
 import { api } from '../services/api';
-import { Newspaper } from 'lucide-react';
+import { Newspaper, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Dashboard() {
   const [complaints, setComplaints] = useState([]);
+  const [nearbyComplaints, setNearbyComplaints] = useState([]);
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [votedId, setVotedId] = useState(null); // Track locally to remove from list immediately after vote
 
   useEffect(() => {
     fetchData();
@@ -26,13 +29,40 @@ export default function Dashboard() {
       ]);
       setComplaints(complaintsData || []);
       setNews(newsData || []);
+      
+      // Also check for nearby tasks
+      const nearby = await api.getNearbyComplaints();
+      setNearbyComplaints(nearby || []);
     } catch (error) {
-      console.error('Error fetching personal complaints:', error);
-      toast.error('Failed to load your complaints');
+      console.error('Error fetching dashboard data:', error);
+      toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
   };
+
+  // Location tracking effect
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            await api.updateLocation(latitude, longitude);
+            // After updating location, fetch nearby tasks again for better accuracy
+            const nearby = await api.getNearbyComplaints();
+            setNearbyComplaints(nearby || []);
+          } catch (err) {
+            console.error('Error updating user location:', err);
+          }
+        },
+        (error) => {
+          console.warn("Location access denied or unavailable:", error);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  }, []);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('en-US', {
@@ -60,6 +90,18 @@ export default function Dashboard() {
         <h1 className="text-3xl font-bold text-gray-900">Personal Dashboard</h1>
         <p className="text-gray-600 mt-1">Track your civic complaints and reports</p>
       </div>
+
+      {/* Community Validation Section */}
+      {nearbyComplaints.length > 0 && (
+        <div className="flex flex-col items-center">
+          <ValidationWidget 
+            complaint={nearbyComplaints[0]} 
+            onActionComplete={() => {
+              setNearbyComplaints(prev => prev.slice(1));
+            }}
+          />
+        </div>
+      )}
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -177,4 +177,38 @@ export const api = {
     
     return handleResponse(response);
   },
+
+  // ============ Community Validation Endpoints ============
+
+  // Update user location
+  async updateLocation(latitude, longitude) {
+    const response = await fetch(`${API_BASE_URL}/users/location`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ latitude, longitude }),
+    });
+    
+    return handleResponse(response);
+  },
+
+  // Get nearby complaints for validation
+  async getNearbyComplaints() {
+    const response = await fetch(`${API_BASE_URL}/complaints-nearby`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+    
+    return handleResponse(response);
+  },
+
+  // Submit verification for a complaint
+  async verifyComplaint(complaintId, isGenuine) {
+    const response = await fetch(`${API_BASE_URL}/complaints/${complaintId}/verify`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ is_genuine: isGenuine }),
+    });
+    
+    return handleResponse(response);
+  },
 };

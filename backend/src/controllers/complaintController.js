@@ -392,6 +392,101 @@ async function getCityNews(req, res, next) {
   }
 }
 
+/**
+ * Get complaints near the user for community validation
+ * GET /api/complaints/nearby
+ */
+async function getNearbyComplaints(req, res, next) {
+  try {
+    const user_id = req.user.user_id;
+
+    // 1. Get user's last location
+    const userResult = await db.query(
+      'SELECT last_location FROM users WHERE user_id = $1',
+      [user_id]
+    );
+
+    if (userResult.rows.length === 0 || !userResult.rows[0].last_location) {
+      return res.status(200).json([]); // No location, no nearby tasks
+    }
+
+    // 2. Find complaints within 5km that:
+    // - Are pending
+    // - Not created by user
+    // - Not already verified by user
+    const nearbyQuery = `
+      SELECT 
+        c.complaint_id, 
+        c.description, 
+        c.category, 
+        c.priority, 
+        c.image_url,
+        ST_X(c.location::geometry) as longitude,
+        ST_Y(c.location::geometry) as latitude,
+        ST_Distance(c.location, $1) as distance_meters
+      FROM complaints c
+      LEFT JOIN complaint_verifications v ON c.complaint_id = v.complaint_id AND v.user_id = $2
+      WHERE c.status = 'pending'
+        AND c.user_id != $2
+        AND v.id IS NULL
+        AND ST_DWithin(c.location, $1, 5000)
+      ORDER BY distance_meters ASC
+      LIMIT 5
+    `;
+
+    const result = await db.query(nearbyQuery, [userResult.rows[0].last_location, user_id]);
+    
+    res.status(200).json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Submit community verification (Yes/No)
+ * POST /api/complaints/:id/verify
+ */
+async function verifyComplaint(req, res, next) {
+  const { id } = req.params;
+  const { is_genuine } = req.body;
+  const user_id = req.user.user_id;
+
+  try {
+    // 1. Record the verification
+    await db.query(
+      `INSERT INTO complaint_verifications (complaint_id, user_id, is_genuine)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (complaint_id, user_id) DO UPDATE SET is_genuine = $3`,
+      [id, user_id, is_genuine]
+    );
+
+    // 2. Check if it should be auto-closed
+    // If it's a "false" report (is_genuine = false), count total false reports
+    if (!is_genuine) {
+      const voteResult = await db.query(
+        'SELECT COUNT(*) as false_count FROM complaint_verifications WHERE complaint_id = $1 AND is_genuine = false',
+        [id]
+      );
+      
+      const falseCount = parseInt(voteResult.rows[0].false_count);
+      
+      if (falseCount >= 3) {
+        await db.query(
+          "UPDATE complaints SET status = 'rejected' WHERE complaint_id = $1",
+          [id]
+        );
+        logger.info({ complaint_id: id, falseCount }, 'Complaint automatically rejected by community');
+      }
+    }
+
+    res.status(200).json({
+      message: 'Verification submitted successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createComplaint,
   getComplaint,
@@ -400,5 +495,7 @@ module.exports = {
   updateComplaintStatus,
   getTrending,
   getHeatmapData,
-  getCityNews
+  getCityNews,
+  getNearbyComplaints,
+  verifyComplaint
 };

@@ -125,4 +125,10 @@ router.get('/heatmap', complaintController.getHeatmapData);
  */
 router.get('/news', complaintController.getCityNews);
 
+/**
+ * Community Validation Routes
+ */
+router.get('/complaints-nearby', authMiddleware, complaintController.getNearbyComplaints);
+router.post('/complaints/:id/verify', authMiddleware, complaintController.verifyComplaint);
+
 module.exports = router;

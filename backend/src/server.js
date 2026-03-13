@@ -5,6 +5,7 @@ const requestLogger = require('./middlewares/requestLogger');
 const db = require('./database/db');
 const authRoutes = require('./routes/authRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
+const userRoutes = require('./routes/userRoutes');
 const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler');
 
 const app = express();
@@ -74,6 +75,7 @@ app.get('/health', async (req, res) => {
  * API routes
  */
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api', complaintRoutes);
 
 /**
