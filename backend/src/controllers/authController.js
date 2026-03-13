@@ -14,9 +14,9 @@ async function register(req, res, next) {
     const { name, email, password, role } = req.body;
 
     // Validate role
-    const validRoles = ['citizen', 'government', 'news'];
+    const validRoles = ['citizen', 'news'];
     if (!validRoles.includes(role)) {
-      throw new ValidationError('Role must be one of: citizen, government, news');
+      throw new ValidationError('Registration is only available for Citizens and News officials.');
     }
 
     // Check if user already exists
