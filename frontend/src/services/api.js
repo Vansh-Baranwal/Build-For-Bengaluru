@@ -1,7 +1,7 @@
 import { getToken } from '../utils/tokenManager';
 
 // Use deployed backend API
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://build-for-bengaluru.onrender.com/api';
 
 // Callback for handling 401 responses (will be set by AuthContext)
 let onUnauthorized = null;
