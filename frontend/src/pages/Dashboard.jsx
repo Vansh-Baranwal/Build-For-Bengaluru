@@ -113,7 +113,7 @@ export default function Dashboard() {
                 complaints.map((complaint) => (
                   <tr key={complaint.complaint_id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {complaint.complaint_id.substring(0, 8)}...
+                      {complaint.complaint_id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">
                       {complaint.category}
