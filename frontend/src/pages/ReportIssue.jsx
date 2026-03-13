@@ -3,6 +3,7 @@ import { MapPin, Send, Image, X, Upload } from 'lucide-react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import VoiceRecorder from '../components/VoiceRecorder';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css'; // Add this to ensure leaflet styles are loaded if they weren't already
@@ -56,6 +57,7 @@ export default function ReportIssue() {
   const [gettingLocation, setGettingLocation] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [audioBlob, setAudioBlob] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -122,8 +124,13 @@ export default function ReportIssue() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.description || !formData.latitude || !formData.longitude) {
-      toast.error('Please fill in all required fields');
+    if (!formData.latitude || !formData.longitude) {
+      toast.error('Please pinpoint the location on the map');
+      return;
+    }
+
+    if (!formData.description && !audioBlob) {
+      toast.error('Please provide a description or a voice recording');
       return;
     }
 
@@ -131,12 +138,18 @@ export default function ReportIssue() {
       setLoading(true);
       
       const formDataToSend = new FormData();
-      formDataToSend.append('description', formData.description);
+      if (formData.description) {
+        formDataToSend.append('description', formData.description);
+      }
       formDataToSend.append('latitude', formData.latitude);
       formDataToSend.append('longitude', formData.longitude);
       
       if (selectedFile) {
         formDataToSend.append('image', selectedFile);
+      }
+
+      if (audioBlob) {
+        formDataToSend.append('audio', audioBlob, 'recording.webm');
       }
 
       const result = await api.submitComplaint(formDataToSend);
@@ -151,6 +164,7 @@ export default function ReportIssue() {
       });
       setSelectedFile(null);
       setPreviewUrl(null);
+      setAudioBlob(null);
       setPosition(null);
     } catch (error) {
       toast.error(error.message || 'Failed to submit complaint');
@@ -179,12 +193,16 @@ export default function ReportIssue() {
               rows={4}
               value={formData.description}
               onChange={handleChange}
-              placeholder="Describe the issue in detail (10-500 characters)..."
+              placeholder="Describe the issue in detail or use the voice recorder below..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
+              required={!audioBlob}
+            />
+            <VoiceRecorder 
+              onRecordingComplete={setAudioBlob} 
+              onRemove={() => setAudioBlob(null)} 
             />
             <p className="text-xs text-gray-500 mt-1">
-              {formData.description.length}/500 characters
+              Minimum 10 characters (text or voice) required.
             </p>
           </div>
 

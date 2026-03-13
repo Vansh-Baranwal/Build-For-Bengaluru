@@ -3,7 +3,9 @@ const config = require('../config/env');
 const logger = require('../config/logger');
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_AUDIO_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
 const MODEL = 'llama-3.2-11b-vision-preview'; 
+const WHISPER_MODEL = 'whisper-large-v3';
 
 // Valid categories for complaint classification
 const VALID_CATEGORIES = [
@@ -157,8 +159,47 @@ async function analyzeComplaint(description, imageUrl = null) {
   }
 }
 
+/**
+ * Transcribe audio buffer using Groq Whisper API
+ * @param {Buffer} audioBuffer - The audio file buffer
+ * @param {string} filename - The original filename
+ * @returns {Promise<string>} Transcribed text
+ */
+async function transcribeAudio(audioBuffer, filename) {
+  const FormData = require('form-data');
+  const formData = new FormData();
+  
+  formData.append('file', audioBuffer, {
+    filename: filename || 'recording.webm',
+    contentType: 'audio/webm' // Default to webm as it's common for browser recording
+  });
+  formData.append('model', WHISPER_MODEL);
+
+  try {
+    const response = await axios.post(
+      GROQ_AUDIO_URL,
+      formData,
+      {
+        headers: {
+          ...formData.getHeaders(),
+          'Authorization': `Bearer ${config.groq.apiKey}`
+        }
+      }
+    );
+
+    return response.data.text;
+  } catch (error) {
+    logger.error({ 
+      error: error.message,
+      data: error.response?.data
+    }, 'Groq Audio transcription error');
+    throw new Error('Failed to transcribe audio complaint');
+  }
+}
+
 module.exports = {
   analyzeComplaint,
+  transcribeAudio,
   VALID_CATEGORIES,
   VALID_SEVERITIES
 };

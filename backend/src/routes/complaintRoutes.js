@@ -42,7 +42,10 @@ const optionalAuthMiddleware = (req, res, next) => {
 router.post(
   '/complaints',
   optionalAuthMiddleware,
-  upload.single('image'), // Handle single file upload with field name 'image'
+  upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'audio', maxCount: 1 }
+  ]),
   complaintRateLimiter,
   validateComplaintSubmission,
   handleValidationErrors,

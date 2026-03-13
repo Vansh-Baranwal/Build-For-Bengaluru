@@ -25,14 +25,38 @@ function mapSeverityToPriority(severity) {
  * POST /api/complaints
  */
 async function createComplaint(req, res, next) {
-  const { description, latitude, longitude } = req.body;
+  let { description, latitude, longitude } = req.body;
   let imageUrl = req.body.image_url || null;
 
   try {
+    // Step 0: Handle audio transcription if a file is provided
+    if (req.files && req.files.audio) {
+      logger.debug('Transcribing audio file');
+      const audioFile = req.files.audio[0];
+      const transcription = await aiService.transcribeAudio(audioFile.buffer, audioFile.originalname);
+      logger.debug({ transcription }, 'Audio transcribed');
+      
+      // If no description, use transcription. If both, combine them.
+      if (!description) {
+        description = transcription;
+      } else {
+        description = `${description} (Voice description: ${transcription})`;
+      }
+    }
+
+    // Validate that we have some kind of description now
+    if (!description || description.trim().length < 10) {
+      return res.status(400).json({
+        error: 'Invalid description',
+        details: 'A description (text or voice) of at least 10 characters is required'
+      });
+    }
+
     // Step 1: Handle image upload if a file is provided
-    if (req.file) {
-      logger.debug('Uploading file to storage');
-      imageUrl = await storageService.uploadImage(req.file);
+    if (req.files && req.files.image) {
+      logger.debug('Uploading image file to storage');
+      const imageFile = req.files.image[0];
+      imageUrl = await storageService.uploadImage(imageFile);
     }
 
     // Step 2: Analyze complaint using AI service (with optional image)

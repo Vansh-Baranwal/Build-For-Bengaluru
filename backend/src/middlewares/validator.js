@@ -5,9 +5,8 @@ const { body, param, validationResult } = require('express-validator');
  */
 const validateComplaintSubmission = [
   body('description')
-    .trim()
-    .isLength({ min: 10, max: 500 })
-    .withMessage('Description must be between 10 and 500 characters'),
+    .optional()
+    .trim(),
   
   body('latitude')
     .isFloat({ min: -90, max: 90 })
