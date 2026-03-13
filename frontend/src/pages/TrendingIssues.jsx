@@ -3,6 +3,7 @@ import { TrendingUp, MapPin, AlertCircle } from 'lucide-react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import CityNews from '../components/CityNews';
 
 export default function TrendingIssues() {
   const [trending, setTrending] = useState([]);
@@ -153,54 +154,7 @@ export default function TrendingIssues() {
           <TrendingUp className="w-7 h-7 mr-3 text-purple-600" />
           Live City News (Bengaluru)
         </h2>
-        
-        {news.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <p className="text-gray-500">No recent news articles found for Bengaluru civic issues.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {news.map((article, idx) => (
-              <a 
-                key={idx} 
-                href={article.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 flex flex-col"
-              >
-                {article.image && (
-                  <div className="h-48 overflow-hidden">
-                    <img 
-                      src={article.image} 
-                      alt={article.title} 
-                      className="w-full h-full object-cover"
-                      onerror="this.style.display='none'"
-                    />
-                  </div>
-                )}
-                <div className="p-5 flex-1 flex flex-col">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider">
-                      {article.source}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {new Date(article.publishedAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 line-clamp-2 mb-2">
-                    {article.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 line-clamp-3 mb-4 flex-1">
-                    {article.description}
-                  </p>
-                  <div className="text-blue-600 text-sm font-semibold flex items-center">
-                    Read full article →
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        )}
+        <CityNews news={news} />
       </div>
     </div>
   );

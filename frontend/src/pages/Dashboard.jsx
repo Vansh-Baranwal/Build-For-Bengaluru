@@ -3,11 +3,14 @@ import { AlertCircle, Droplets, Trash2, AlertTriangle } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import AlertBanner from '../components/AlertBanner';
 import LoadingSpinner from '../components/LoadingSpinner';
+import CityNews from '../components/CityNews';
 import { api } from '../services/api';
+import { Newspaper } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Dashboard() {
   const [complaints, setComplaints] = useState([]);
+  const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,8 +20,12 @@ export default function Dashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await api.getMyComplaints();
-      setComplaints(data || []);
+      const [complaintsData, newsData] = await Promise.all([
+        api.getMyComplaints(),
+        api.getCityNews()
+      ]);
+      setComplaints(complaintsData || []);
+      setNews(newsData || []);
     } catch (error) {
       console.error('Error fetching personal complaints:', error);
       toast.error('Failed to load your complaints');
@@ -136,6 +143,15 @@ export default function Dashboard() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* City News Section */}
+      <div className="mt-8">
+        <div className="flex items-center space-x-2 mb-6">
+          <Newspaper className="w-6 h-6 text-purple-600" />
+          <h2 className="text-2xl font-bold text-gray-900">City News & Trends</h2>
+        </div>
+        <CityNews news={news} />
       </div>
     </div>
   );

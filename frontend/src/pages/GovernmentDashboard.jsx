@@ -2,23 +2,27 @@ import { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { Building2, RefreshCw } from 'lucide-react';
+import CityNews from '../components/CityNews';
+import { Building2, RefreshCw, Newspaper } from 'lucide-react';
 
 const GovernmentDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [trendingData, setTrendingData] = useState([]);
+  const [news, setNews] = useState([]);
   const [alertMessage, setAlertMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchDashboardData = async () => {
     setIsLoading(true);
     try {
-      const [allComplaints, trending] = await Promise.all([
+      const [allComplaints, trending, newsData] = await Promise.all([
         api.getAllComplaints(),
-        api.getTrendingIssues()
+        api.getTrendingIssues(),
+        api.getCityNews()
       ]);
       setComplaints(allComplaints);
       setTrendingData(trending);
+      setNews(newsData || []);
 
       if (trending.length > 0) {
         setAlertMessage(
@@ -151,6 +155,15 @@ const GovernmentDashboard = () => {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* City News Section */}
+        <div className="mt-12">
+          <div className="flex items-center space-x-2 mb-6">
+            <Newspaper className="w-6 h-6 text-purple-600" />
+            <h2 className="text-2xl font-bold text-gray-900">Live City News Feed</h2>
+          </div>
+          <CityNews news={news} />
         </div>
 
       </div>
