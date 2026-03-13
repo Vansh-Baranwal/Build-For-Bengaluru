@@ -331,9 +331,10 @@ describe('Property Tests: Error Handling', () => {
     });
 
     test('should not expose sensitive information in production mode', async () => {
-      // Set NODE_ENV to production for this test
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
+      // Mock config to return production environment
+      const config = require('../../../src/config/env');
+      const originalNodeEnv = config.server.nodeEnv;
+      config.server.nodeEnv = 'production';
 
       await fc.assert(
         fc.asyncProperty(
@@ -360,8 +361,8 @@ describe('Property Tests: Error Handling', () => {
         { numRuns: 50 }
       );
 
-      // Restore original NODE_ENV
-      process.env.NODE_ENV = originalEnv;
+      // Restore original config
+      config.server.nodeEnv = originalNodeEnv;
     });
   });
 
