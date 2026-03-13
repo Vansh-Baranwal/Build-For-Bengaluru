@@ -2,56 +2,40 @@ import { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
-import StatusBadge from '../components/StatusBadge';
-import PriorityBadge from '../components/PriorityBadge';
 import { Building2, RefreshCw } from 'lucide-react';
 
 const GovernmentDashboard = () => {
   const [complaints, setComplaints] = useState([]);
+  const [trendingData, setTrendingData] = useState([]);
+  const [alertMessage, setAlertMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState(null);
 
-  const fetchComplaints = async () => {
+  const fetchDashboardData = async () => {
     setIsLoading(true);
     try {
-      const data = await api.getAllComplaints();
-      setComplaints(data);
+      const [allComplaints, trending] = await Promise.all([
+        api.getAllComplaints(),
+        api.getTrendingIssues()
+      ]);
+      setComplaints(allComplaints);
+      setTrendingData(trending);
+
+      if (trending.length > 0) {
+        setAlertMessage(
+          `High number of ${trending[0].issue_type} complaints detected near ${trending[0].latitude.toFixed(4)}, ${trending[0].longitude.toFixed(4)}.`
+        );
+      }
     } catch (error) {
-      console.error('Error fetching complaints:', error);
-      toast.error('Failed to load complaints');
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load dashboard data');
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchComplaints();
+    fetchDashboardData();
   }, []);
-
-  const handleStatusUpdate = async (complaintId, newStatus) => {
-    setUpdatingId(complaintId);
-    try {
-      await api.updateComplaintStatus(complaintId, newStatus);
-      toast.success('Status updated successfully');
-      // Refresh the complaints list
-      await fetchComplaints();
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Failed to update status');
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
 
   if (isLoading) {
     return (
@@ -73,15 +57,15 @@ const GovernmentDashboard = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  Government Dashboard
+                  City Overview
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  Manage and track all civic complaints
+                  High-level insights into city infrastructure and active reports
                 </p>
               </div>
             </div>
             <button
-              onClick={fetchComplaints}
+              onClick={fetchDashboardData}
               className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <RefreshCw className="h-4 w-4" />
@@ -90,113 +74,85 @@ const GovernmentDashboard = () => {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <p className="text-sm text-gray-600">Total Complaints</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">
-              {complaints.length}
-            </p>
+        {/* Civic Alert Banner */}
+        {alertMessage && (
+          <div className="mb-8 bg-red-50 border-l-4 border-red-500 p-4 rounded-md shadow-sm">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Civic Alert</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{alertMessage}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <p className="text-sm text-gray-600">Pending</p>
-            <p className="text-3xl font-bold text-yellow-600 mt-2">
-              {complaints.filter((c) => c.status === 'pending').length}
-            </p>
+        )}
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div>
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Total Complaints</p>
+              <p className="text-4xl font-bold text-gray-900 mt-2">
+                {complaints.length}
+              </p>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-sm text-gray-600 flex items-center">
+                <Building2 className="w-4 h-4 mr-1 text-gray-400" />
+                Across the city
+              </p>
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <p className="text-sm text-gray-600">In Progress</p>
-            <p className="text-3xl font-bold text-blue-600 mt-2">
-              {complaints.filter((c) => c.status === 'in_progress').length}
-            </p>
+          
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div>
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Pending</p>
+              <p className="text-4xl font-bold text-yellow-600 mt-2">
+                {complaints.filter((c) => c.status === 'pending').length}
+              </p>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-sm text-yellow-600 flex items-center">
+                Review required
+              </p>
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <p className="text-sm text-gray-600">Resolved</p>
-            <p className="text-3xl font-bold text-green-600 mt-2">
-              {complaints.filter((c) => c.status === 'resolved').length}
-            </p>
+          
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div>
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">In Progress</p>
+              <p className="text-4xl font-bold text-blue-600 mt-2">
+                {complaints.filter((c) => c.status === 'in_progress').length}
+              </p>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-sm text-blue-600 flex items-center">
+                Currently being fixed
+              </p>
+            </div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+            <div>
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Resolved</p>
+              <p className="text-4xl font-bold text-green-600 mt-2">
+                {complaints.filter((c) => c.status === 'resolved' || c.status === 'closed').length}
+              </p>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-sm text-green-600 flex items-center">
+                Completed issues
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Complaints Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Priority
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Update Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {complaints.length === 0 ? (
-                  <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
-                      No complaints found
-                    </td>
-                  </tr>
-                ) : (
-                  complaints.map((complaint) => (
-                    <tr key={complaint.complaint_id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {complaint.complaint_id.substring(0, 8)}...
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {complaint.category}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <PriorityBadge priority={complaint.priority} />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <StatusBadge status={complaint.status} />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {complaint.latitude.toFixed(4)}, {complaint.longitude.toFixed(4)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(complaint.created_at)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          value={complaint.status}
-                          onChange={(e) =>
-                            handleStatusUpdate(complaint.complaint_id, e.target.value)
-                          }
-                          disabled={updatingId === complaint.complaint_id}
-                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="in_progress">In Progress</option>
-                          <option value="resolved">Resolved</option>
-                          <option value="closed">Closed</option>
-                        </select>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </div>
   );
