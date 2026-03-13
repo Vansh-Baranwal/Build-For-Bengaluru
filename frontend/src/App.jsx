@@ -28,6 +28,7 @@ function App() {
             <Route path="/login/citizen" element={<CitizenLogin />} />
             <Route path="/login/government" element={<GovernmentLogin />} />
             <Route path="/login/news" element={<NewsLogin />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
 
             {/* Application Routes - Wrapped in MainLayout */}

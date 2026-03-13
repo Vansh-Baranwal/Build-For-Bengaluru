@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Building2, ArrowRight, ShieldCheck, Mail, Lock } from 'lucide-react';
+import { Building2, ArrowRight, ShieldCheck, User, Lock } from 'lucide-react';
 
 const GovernmentLogin = () => {
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +24,7 @@ const GovernmentLogin = () => {
     setServerError('');
 
     try {
-      await login(formData.email, formData.password, 'government');
+      await login(formData.username, formData.password, 'government');
     } catch (error) {
       setServerError(error.message || 'Authentication failed. Please check credentials.');
     } finally {
@@ -62,12 +62,12 @@ const GovernmentLogin = () => {
               <div className="relative">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Username</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
-                    name="email"
+                    name="username"
                     type="text"
                     required
-                    value={formData.email}
+                    value={formData.username}
                     onChange={handleChange}
                     className="w-full pl-12 pr-6 py-4 bg-slate-50 border-transparent rounded-2xl text-slate-900 font-bold focus:bg-white focus:ring-2 focus:ring-indigo-600 transition-all outline-none"
                     placeholder="admin"
