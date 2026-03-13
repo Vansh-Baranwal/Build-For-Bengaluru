@@ -88,9 +88,7 @@ export const api = {
   async submitComplaint(data) {
     const response = await fetch(`${API_BASE_URL}/complaints`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     
