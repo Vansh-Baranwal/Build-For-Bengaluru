@@ -115,7 +115,9 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
-// Start the server
-startServer();
+// Start the server only if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
 
 module.exports = app;
