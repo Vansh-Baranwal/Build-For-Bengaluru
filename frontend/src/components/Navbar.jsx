@@ -15,7 +15,7 @@ export default function Navbar({ onMenuClick }) {
             </button>
             
             <div className="flex items-center ml-2 lg:ml-0">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div className="ml-3">

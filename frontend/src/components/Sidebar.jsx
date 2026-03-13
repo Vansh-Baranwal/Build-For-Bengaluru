@@ -65,12 +65,12 @@ export default function Sidebar({ isOpen, onClose }) {
                   className={`
                     flex items-center px-4 py-3 rounded-lg transition-all duration-200
                     ${active
-                      ? 'bg-primary-50 text-primary-700 font-semibold shadow-sm'
+                      ? 'bg-blue-50 text-blue-700 font-semibold shadow-sm'
                       : 'text-gray-700 hover:bg-gray-100'
                     }
                   `}
                 >
-                  <Icon className={`w-5 h-5 ${active ? 'text-primary-600' : 'text-gray-500'}`} />
+                  <Icon className={`w-5 h-5 ${active ? 'text-blue-600' : 'text-gray-500'}`} />
                   <span className="ml-3">{item.label}</span>
                 </Link>
               );

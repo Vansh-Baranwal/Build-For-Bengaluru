@@ -9,7 +9,7 @@ export default function LoadingSpinner({ size = 'md', text = 'Loading...' }) {
 
   return (
     <div className="flex flex-col items-center justify-center p-8">
-      <Loader2 className={`${sizeClasses[size]} animate-spin text-primary-600`} />
+      <Loader2 className={`${sizeClasses[size]} animate-spin text-blue-600`} />
       {text && <p className="mt-2 text-gray-600">{text}</p>}
     </div>
   );

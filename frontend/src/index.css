@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 @layer base {
   body {
@@ -14,13 +13,10 @@
   }
   
   .btn-primary {
-    @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors duration-200;
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200;
   }
   
   .btn-secondary {
     @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-200;
   }
 }
-
-/* Leaflet CSS */
-@import 'leaflet/dist/leaflet.css';
