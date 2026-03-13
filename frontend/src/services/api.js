@@ -11,11 +11,13 @@ export const setUnauthorizedCallback = (callback) => {
 };
 
 // Helper function to add Authorization header when token exists
-const getAuthHeaders = () => {
+const getAuthHeaders = (contentType = 'application/json') => {
   const token = getToken();
-  const headers = {
-    'Content-Type': 'application/json',
-  };
+  const headers = {};
+  
+  if (contentType) {
+    headers['Content-Type'] = contentType;
+  }
   
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -88,10 +90,7 @@ export const api = {
   async submitComplaint(formData) {
     const response = await fetch(`${API_BASE_URL}/complaints`, {
       method: 'POST',
-      headers: {
-        ...getAuthHeaders(),
-        // Note: Don't set Content-Type for FormData, the browser adds boundary
-      },
+      headers: getAuthHeaders(null),
       body: formData,
     });
     

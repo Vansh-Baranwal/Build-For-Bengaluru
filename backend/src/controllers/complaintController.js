@@ -28,7 +28,23 @@ async function createComplaint(req, res, next) {
   let { description, latitude, longitude } = req.body;
   let imageUrl = req.body.image_url || null;
 
+  logger.debug({ 
+    body: req.body, 
+    files: req.files ? Object.keys(req.files) : 'none' 
+  }, 'Processing createComplaint request');
+
   try {
+    // Parse coordinates explicitly
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      return res.status(400).json({
+        error: 'Invalid coordinates',
+        details: 'Latitude and longitude must be valid numbers'
+      });
+    }
+
     // Step 0: Handle audio transcription if a file is provided
     if (req.files && req.files.audio) {
       logger.debug('Transcribing audio file');
@@ -89,8 +105,8 @@ async function createComplaint(req, res, next) {
       description,
       category,
       priority,
-      longitude,
-      latitude,
+      lng, // longitude
+      lat, // latitude
       imageUrl
     ]);
 

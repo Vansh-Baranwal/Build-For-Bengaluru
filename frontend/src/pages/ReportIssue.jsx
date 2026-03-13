@@ -194,6 +194,7 @@ export default function ReportIssue() {
               placeholder="Describe the issue in detail or use the voice recorder below..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required={!audioBlob}
+              minLength={10}
             />
             <VoiceRecorder 
               onRecordingComplete={setAudioBlob} 
