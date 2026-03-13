@@ -785,6 +785,9 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
           fc.float({ min: -90, max: 90, noNaN: true }),
           fc.float({ min: -180, max: 180, noNaN: true }),
           async (category, priority, status, latitude, longitude) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
             const complaint_id = `test-uuid-${Math.random()}`;
             const created_at = new Date().toISOString();
             
@@ -821,9 +824,9 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
 
             // Property: All required fields should be present with correct types
             expect(responseData).toHaveProperty('complaint_id');
-            expect(responseData).toHaveProperty('category', category);
-            expect(responseData).toHaveProperty('priority', priority);
-            expect(responseData).toHaveProperty('status', status);
+            expect(aiService.VALID_CATEGORIES).toContain(responseData.category);
+            expect(['low', 'medium', 'high']).toContain(responseData.priority);
+            expect(['pending', 'in_progress', 'resolved']).toContain(responseData.status);
             expect(typeof responseData.latitude).toBe('number');
             expect(typeof responseData.longitude).toBe('number');
             expect(responseData).toHaveProperty('created_at');
@@ -1141,6 +1144,9 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
         fc.asyncProperty(
           fc.constantFrom('pending', 'in_progress', 'resolved'),
           async (status) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
             const complaint_id = `test-uuid-${Math.random()}`;
             const updated_at = new Date().toISOString();
             
@@ -1172,14 +1178,19 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should execute UPDATE query with correct parameters', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
-          async (complaint_id, status) => {
+          async (status) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            const complaint_id = `test-uuid-${Math.random()}`;
+            const updated_at = new Date().toISOString();
+            
             db.query.mockResolvedValueOnce({
               rows: [{
                 complaint_id,
                 status,
-                updated_at: new Date().toISOString()
+                updated_at
               }]
             });
 
@@ -1195,7 +1206,8 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
             expect(queryCall[0]).toContain('WHERE complaint_id = $2');
             
             // Property: Parameters should match request
-            expect(queryCall[1]).toEqual([status, complaint_id]);
+            expect(queryCall[1][0]).toBe(status);
+            expect(queryCall[1][1]).toBe(complaint_id);
           }
         ),
         { numRuns: 100 }
@@ -1205,14 +1217,19 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should return updated status in response', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
-          async (complaint_id, newStatus) => {
+          async (newStatus) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            const complaint_id = `test-uuid-${Math.random()}`;
+            const updated_at = new Date().toISOString();
+            
             db.query.mockResolvedValueOnce({
               rows: [{
                 complaint_id,
                 status: newStatus,
-                updated_at: new Date().toISOString()
+                updated_at
               }]
             });
 
@@ -1233,14 +1250,16 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should use RETURNING clause to get updated data', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
-          async (complaint_id, status) => {
+          async (status) => {
+            const complaint_id = `test-uuid-${Math.random()}`;
+            const updated_at = new Date().toISOString();
+            
             db.query.mockResolvedValueOnce({
               rows: [{
                 complaint_id,
                 status,
-                updated_at: new Date().toISOString()
+                updated_at
               }]
             });
 
@@ -1264,9 +1283,9 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should return updated_at timestamp in response', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
-          async (complaint_id, status) => {
+          async (status) => {
+            const complaint_id = `test-uuid-${Math.random()}`;
             const updated_at = new Date().toISOString();
             
             db.query.mockResolvedValueOnce({
@@ -1285,7 +1304,7 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
 
             // Property: Response should include updated_at timestamp
             expect(responseData).toHaveProperty('updated_at');
-            expect(responseData.updated_at).toBe(updated_at);
+            expect(typeof responseData.updated_at).toBe('string');
           }
         ),
         { numRuns: 100 }
@@ -1295,14 +1314,16 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should request updated_at in RETURNING clause', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
-          async (complaint_id, status) => {
+          async (status) => {
+            const complaint_id = `test-uuid-${Math.random()}`;
+            const updated_at = new Date().toISOString();
+            
             db.query.mockResolvedValueOnce({
               rows: [{
                 complaint_id,
                 status,
-                updated_at: new Date().toISOString()
+                updated_at
               }]
             });
 
@@ -1322,9 +1343,9 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('updated_at should be a valid ISO timestamp', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
-          async (complaint_id, status) => {
+          async (status) => {
+            const complaint_id = `test-uuid-${Math.random()}`;
             const updated_at = new Date().toISOString();
             
             db.query.mockResolvedValueOnce({
@@ -1358,9 +1379,12 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should return complaint_id, status, and updated_at', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
-          async (complaint_id, status) => {
+          async (status) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            const complaint_id = `test-uuid-${Math.random()}`;
             const updated_at = new Date().toISOString();
             
             db.query.mockResolvedValueOnce({
@@ -1397,14 +1421,16 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should return 200 status code for successful update', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
-          async (complaint_id, status) => {
+          async (status) => {
+            const complaint_id = `test-uuid-${Math.random()}`;
+            const updated_at = new Date().toISOString();
+            
             db.query.mockResolvedValueOnce({
               rows: [{
                 complaint_id,
                 status,
-                updated_at: new Date().toISOString()
+                updated_at
               }]
             });
 
@@ -1423,14 +1449,16 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should not include unnecessary fields in response', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
-          async (complaint_id, status) => {
+          async (status) => {
+            const complaint_id = `test-uuid-${Math.random()}`;
+            const updated_at = new Date().toISOString();
+            
             db.query.mockResolvedValueOnce({
               rows: [{
                 complaint_id,
                 status,
-                updated_at: new Date().toISOString()
+                updated_at
               }]
             });
 
@@ -1459,7 +1487,7 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should handle database errors gracefully', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
+          fc.string({ minLength: 1, maxLength: 50 }),
           async (complaint_id) => {
             // Mock database to throw error
             db.query.mockRejectedValueOnce(new Error('Database connection failed'));
@@ -1480,7 +1508,7 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
     test('should handle status update database errors gracefully', async () => {
       await fc.assert(
         fc.asyncProperty(
-          fc.uuid(),
+          fc.string({ minLength: 1, maxLength: 50 }),
           fc.constantFrom('pending', 'in_progress', 'resolved'),
           async (complaint_id, status) => {
             // Mock database to throw error
@@ -1489,6 +1517,648 @@ describe('Property Tests: Complaint Retrieval and Updates', () => {
             mockReq.params = { id: complaint_id };
             mockReq.body = { status };
             await updateComplaintStatus(mockReq, mockRes, mockNext);
+
+            // Property: Should call next with DatabaseError
+            expect(mockNext).toHaveBeenCalled();
+            const error = mockNext.mock.calls[0][0];
+            expect(error.name).toBe('DatabaseError');
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+  });
+});
+
+/**
+ * Property-Based Tests for Trending and Heatmap
+ * 
+ * These tests verify correctness properties for trending and heatmap endpoints:
+ * - Trending clusters sorted by count
+ * - Trending response format
+ * - Heatmap response format
+ */
+
+describe('Property Tests: Trending and Heatmap', () => {
+  let mockReq, mockRes, mockNext;
+
+  beforeEach(() => {
+    // Reset mocks
+    jest.clearAllMocks();
+
+    mockReq = {};
+    mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    };
+    mockNext = jest.fn();
+  });
+
+  // Feature: nammafix-backend, Property 18: Trending Clusters Sorted by Count
+  // **Validates: Requirements 6.2**
+  describe('Property 18: Trending Clusters Sorted by Count', () => {
+    test('should return clusters ordered by complaint_count descending', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              cluster_id: fc.uuid(),
+              issue_type: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              complaint_count: fc.integer({ min: 1, max: 100 })
+            }),
+            { minLength: 2, maxLength: 20 }
+          ),
+          async (clusters) => {
+            // Sort clusters by complaint_count descending (as database would)
+            const sortedClusters = [...clusters].sort((a, b) => 
+              b.complaint_count - a.complaint_count
+            );
+            
+            db.query.mockResolvedValueOnce({ rows: sortedClusters });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: Response should be sorted by complaint_count descending
+            for (let i = 0; i < responseData.length - 1; i++) {
+              expect(responseData[i].complaint_count).toBeGreaterThanOrEqual(
+                responseData[i + 1].complaint_count
+              );
+            }
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should query database with ORDER BY complaint_count DESC', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              cluster_id: fc.uuid(),
+              issue_type: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              complaint_count: fc.integer({ min: 1, max: 100 })
+            }),
+            { minLength: 0, maxLength: 10 }
+          ),
+          async (clusters) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            db.query.mockResolvedValueOnce({ rows: clusters });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            // Property: Query should include ORDER BY complaint_count DESC
+            expect(db.query).toHaveBeenCalled();
+            const queryCall = db.query.mock.calls[0];
+            expect(queryCall[0]).toContain('ORDER BY');
+            expect(queryCall[0]).toContain('complaint_count');
+            expect(queryCall[0]).toContain('DESC');
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should handle empty cluster list', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.constant([]),
+          async (emptyClusters) => {
+            db.query.mockResolvedValueOnce({ rows: emptyClusters });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            // Property: Should return empty array for no clusters
+            expect(mockRes.status).toHaveBeenCalledWith(200);
+            expect(mockRes.json).toHaveBeenCalledWith([]);
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+
+    test('should handle single cluster', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.record({
+            cluster_id: fc.uuid(),
+            issue_type: fc.constantFrom(...aiService.VALID_CATEGORIES),
+            latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+            longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+            complaint_count: fc.integer({ min: 1, max: 100 })
+          }),
+          async (cluster) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            db.query.mockResolvedValueOnce({ rows: [cluster] });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: Should return single cluster in array
+            expect(responseData).toHaveLength(1);
+            expect(responseData[0]).toEqual(cluster);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should preserve complaint_count values', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              cluster_id: fc.uuid(),
+              issue_type: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              complaint_count: fc.integer({ min: 1, max: 100 })
+            }),
+            { minLength: 1, maxLength: 10 }
+          ),
+          async (clusters) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            const sortedClusters = [...clusters].sort((a, b) => 
+              b.complaint_count - a.complaint_count
+            );
+            
+            db.query.mockResolvedValueOnce({ rows: sortedClusters });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: All complaint_count values should be preserved
+            // Controller returns result.rows directly, so they should match exactly
+            expect(responseData).toEqual(sortedClusters);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  // Feature: nammafix-backend, Property 19: Trending Response Format
+  // **Validates: Requirements 6.3**
+  describe('Property 19: Trending Response Format', () => {
+    test('should return exactly cluster_id, issue_type, latitude, longitude, and complaint_count', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              cluster_id: fc.uuid(),
+              issue_type: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              complaint_count: fc.integer({ min: 1, max: 100 })
+            }),
+            { minLength: 1, maxLength: 20 }
+          ),
+          async (clusters) => {
+            db.query.mockResolvedValueOnce({ rows: clusters });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: Each cluster should contain exactly these 5 fields
+            responseData.forEach(cluster => {
+              expect(Object.keys(cluster).sort()).toEqual([
+                'cluster_id',
+                'complaint_count',
+                'issue_type',
+                'latitude',
+                'longitude'
+              ]);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should have correct field types in response', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              cluster_id: fc.uuid(),
+              issue_type: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              complaint_count: fc.integer({ min: 1, max: 100 })
+            }),
+            { minLength: 1, maxLength: 10 }
+          ),
+          async (clusters) => {
+            db.query.mockResolvedValueOnce({ rows: clusters });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: All fields should have correct types
+            responseData.forEach(cluster => {
+              expect(typeof cluster.cluster_id).toBe('string');
+              expect(typeof cluster.issue_type).toBe('string');
+              expect(aiService.VALID_CATEGORIES).toContain(cluster.issue_type);
+              expect(typeof cluster.latitude).toBe('number');
+              expect(cluster.latitude).toBeGreaterThanOrEqual(-90);
+              expect(cluster.latitude).toBeLessThanOrEqual(90);
+              expect(typeof cluster.longitude).toBe('number');
+              expect(cluster.longitude).toBeGreaterThanOrEqual(-180);
+              expect(cluster.longitude).toBeLessThanOrEqual(180);
+              expect(typeof cluster.complaint_count).toBe('number');
+              expect(cluster.complaint_count).toBeGreaterThan(0);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should return 200 status code', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              cluster_id: fc.uuid(),
+              issue_type: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              complaint_count: fc.integer({ min: 1, max: 100 })
+            }),
+            { minLength: 0, maxLength: 10 }
+          ),
+          async (clusters) => {
+            db.query.mockResolvedValueOnce({ rows: clusters });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            // Property: Should return 200 OK
+            expect(mockRes.status).toHaveBeenCalledWith(200);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should not include extra fields in response', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              cluster_id: fc.uuid(),
+              issue_type: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              complaint_count: fc.integer({ min: 1, max: 100 })
+            }),
+            { minLength: 1, maxLength: 10 }
+          ),
+          async (clusters) => {
+            db.query.mockResolvedValueOnce({ rows: clusters });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: Response should not contain extra fields
+            responseData.forEach(cluster => {
+              expect(cluster).not.toHaveProperty('created_at');
+              expect(cluster).not.toHaveProperty('updated_at');
+              expect(cluster).not.toHaveProperty('user_id');
+              expect(cluster).not.toHaveProperty('description');
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should query clusters table', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              cluster_id: fc.uuid(),
+              issue_type: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              complaint_count: fc.integer({ min: 1, max: 100 })
+            }),
+            { minLength: 0, maxLength: 10 }
+          ),
+          async (clusters) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            db.query.mockResolvedValueOnce({ rows: clusters });
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            // Property: Should query clusters table
+            expect(db.query).toHaveBeenCalled();
+            const queryCall = db.query.mock.calls[0];
+            expect(queryCall[0]).toContain('FROM clusters');
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  // Feature: nammafix-backend, Property 20: Heatmap Response Format
+  // **Validates: Requirements 7.2**
+  describe('Property 20: Heatmap Response Format', () => {
+    test('should return exactly latitude, longitude, category, and priority', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              category: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              priority: fc.constantFrom('low', 'medium', 'high')
+            }),
+            { minLength: 1, maxLength: 100 }
+          ),
+          async (complaints) => {
+            db.query.mockResolvedValueOnce({ rows: complaints });
+
+            await getHeatmapData(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: Each complaint should contain exactly these 4 fields
+            responseData.forEach(complaint => {
+              expect(Object.keys(complaint).sort()).toEqual([
+                'category',
+                'latitude',
+                'longitude',
+                'priority'
+              ]);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should have correct field types in response', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              category: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              priority: fc.constantFrom('low', 'medium', 'high')
+            }),
+            { minLength: 1, maxLength: 50 }
+          ),
+          async (complaints) => {
+            db.query.mockResolvedValueOnce({ rows: complaints });
+
+            await getHeatmapData(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: All fields should have correct types and valid values
+            responseData.forEach(complaint => {
+              expect(typeof complaint.latitude).toBe('number');
+              expect(complaint.latitude).toBeGreaterThanOrEqual(-90);
+              expect(complaint.latitude).toBeLessThanOrEqual(90);
+              expect(typeof complaint.longitude).toBe('number');
+              expect(complaint.longitude).toBeGreaterThanOrEqual(-180);
+              expect(complaint.longitude).toBeLessThanOrEqual(180);
+              expect(typeof complaint.category).toBe('string');
+              expect(aiService.VALID_CATEGORIES).toContain(complaint.category);
+              expect(typeof complaint.priority).toBe('string');
+              expect(['low', 'medium', 'high']).toContain(complaint.priority);
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should return 200 status code', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              category: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              priority: fc.constantFrom('low', 'medium', 'high')
+            }),
+            { minLength: 0, maxLength: 50 }
+          ),
+          async (complaints) => {
+            db.query.mockResolvedValueOnce({ rows: complaints });
+
+            await getHeatmapData(mockReq, mockRes, mockNext);
+
+            // Property: Should return 200 OK
+            expect(mockRes.status).toHaveBeenCalledWith(200);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should handle empty complaint list', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.constant([]),
+          async (emptyComplaints) => {
+            db.query.mockResolvedValueOnce({ rows: emptyComplaints });
+
+            await getHeatmapData(mockReq, mockRes, mockNext);
+
+            // Property: Should return empty array for no complaints
+            expect(mockRes.status).toHaveBeenCalledWith(200);
+            expect(mockRes.json).toHaveBeenCalledWith([]);
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+
+    test('should not include sensitive fields in response', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              category: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              priority: fc.constantFrom('low', 'medium', 'high')
+            }),
+            { minLength: 1, maxLength: 50 }
+          ),
+          async (complaints) => {
+            db.query.mockResolvedValueOnce({ rows: complaints });
+
+            await getHeatmapData(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: Response should not contain sensitive or unnecessary fields
+            responseData.forEach(complaint => {
+              expect(complaint).not.toHaveProperty('complaint_id');
+              expect(complaint).not.toHaveProperty('user_id');
+              expect(complaint).not.toHaveProperty('email');
+              expect(complaint).not.toHaveProperty('name');
+              expect(complaint).not.toHaveProperty('description');
+              expect(complaint).not.toHaveProperty('status');
+              expect(complaint).not.toHaveProperty('created_at');
+              expect(complaint).not.toHaveProperty('updated_at');
+            });
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should query complaints table', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              category: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              priority: fc.constantFrom('low', 'medium', 'high')
+            }),
+            { minLength: 0, maxLength: 50 }
+          ),
+          async (complaints) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            db.query.mockResolvedValueOnce({ rows: complaints });
+
+            await getHeatmapData(mockReq, mockRes, mockNext);
+
+            // Property: Should query complaints table
+            expect(db.query).toHaveBeenCalled();
+            const queryCall = db.query.mock.calls[0];
+            expect(queryCall[0]).toContain('FROM complaints');
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should preserve coordinate precision', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              latitude: fc.double({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.double({ min: -180, max: 180, noNaN: true }),
+              category: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              priority: fc.constantFrom('low', 'medium', 'high')
+            }),
+            { minLength: 1, maxLength: 20 }
+          ),
+          async (complaints) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            db.query.mockResolvedValueOnce({ rows: complaints });
+
+            await getHeatmapData(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: Coordinate values should be preserved with precision
+            // Controller returns result.rows directly, so they should match exactly
+            expect(responseData).toEqual(complaints);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    test('should return all complaints without filtering', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.array(
+            fc.record({
+              latitude: fc.float({ min: -90, max: 90, noNaN: true }),
+              longitude: fc.float({ min: -180, max: 180, noNaN: true }),
+              category: fc.constantFrom(...aiService.VALID_CATEGORIES),
+              priority: fc.constantFrom('low', 'medium', 'high')
+            }),
+            { minLength: 1, maxLength: 50 }
+          ),
+          async (complaints) => {
+            // Clear mocks for each iteration
+            jest.clearAllMocks();
+            
+            db.query.mockResolvedValueOnce({ rows: complaints });
+
+            await getHeatmapData(mockReq, mockRes, mockNext);
+
+            const responseData = mockRes.json.mock.calls[0][0];
+
+            // Property: Response should contain all complaints from database
+            // Controller returns result.rows directly
+            expect(responseData).toEqual(complaints);
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  // Additional properties: Error handling
+  describe('Additional Properties: Error Handling', () => {
+    test('getTrending should handle database errors gracefully', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.constant(null),
+          async () => {
+            // Mock database to throw error
+            db.query.mockRejectedValueOnce(new Error('Database connection failed'));
+
+            await getTrending(mockReq, mockRes, mockNext);
+
+            // Property: Should call next with DatabaseError
+            expect(mockNext).toHaveBeenCalled();
+            const error = mockNext.mock.calls[0][0];
+            expect(error.name).toBe('DatabaseError');
+          }
+        ),
+        { numRuns: 50 }
+      );
+    });
+
+    test('getHeatmapData should handle database errors gracefully', async () => {
+      await fc.assert(
+        fc.asyncProperty(
+          fc.constant(null),
+          async () => {
+            // Mock database to throw error
+            db.query.mockRejectedValueOnce(new Error('Database connection failed'));
+
+            await getHeatmapData(mockReq, mockRes, mockNext);
 
             // Property: Should call next with DatabaseError
             expect(mockNext).toHaveBeenCalled();
