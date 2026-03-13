@@ -21,7 +21,7 @@ async function register(req, res, next) {
 
     // Check if user already exists
     const existingUser = await db.query(
-      'SELECT user_id FROM users WHERE email = $1',
+      'SELECT user_id FROM public.users WHERE email = $1',
       [email]
     );
 
@@ -35,7 +35,7 @@ async function register(req, res, next) {
 
     // Insert user
     await db.query(
-      `INSERT INTO users (name, email, password_hash, role) 
+      `INSERT INTO public.users (name, email, password_hash, role) 
        VALUES ($1, $2, $3, $4)`,
       [name, email, password_hash, role]
     );
@@ -60,7 +60,7 @@ async function login(req, res, next) {
 
     // Find user by email
     const result = await db.query(
-      'SELECT user_id, name, email, password_hash, role FROM users WHERE email = $1',
+      'SELECT user_id, name, email, password_hash, role FROM public.users WHERE email = $1',
       [email]
     );
 
@@ -117,7 +117,7 @@ async function login(req, res, next) {
 async function getProfile(req, res, next) {
   try {
     const result = await db.query(
-      'SELECT user_id, name, email, role, created_at FROM users WHERE user_id = $1',
+      'SELECT user_id, name, email, role, created_at FROM public.users WHERE user_id = $1',
       [req.user.user_id]
     );
 

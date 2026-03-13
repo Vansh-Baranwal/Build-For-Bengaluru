@@ -28,7 +28,7 @@ async function runAuthMigration() {
     console.log('  - password_hash (TEXT) - bcrypt hashed passwords');
     
   } catch (error) {
-    console.error('❌ Migration failed:', error.message);
+    console.error('❌ Migration failed:', error);
     process.exit(1);
   } finally {
     await pool.end();

@@ -12,6 +12,11 @@ const app = express();
 /**
  * Middleware setup
  */
+const cors = require('cors');
+
+// CORS Middleware
+app.use(cors({ origin: 'http://localhost:5173' }));
+
 // Parse JSON request bodies
 app.use(express.json());
 
