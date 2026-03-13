@@ -8,16 +8,37 @@ import {
   X 
 } from 'lucide-react';
 
+import { useAuth } from '../contexts/AuthContext';
+
 export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
+  const { user } = useAuth();
 
-  const navItems = [
-    { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/report', icon: FileText, label: 'Report Issue' },
-    { path: '/track', icon: Search, label: 'Track Complaint' },
-    { path: '/map', icon: Map, label: 'City Map' },
-    { path: '/trending', icon: TrendingUp, label: 'Trending Issues' },
-  ];
+  // Define navigation items based on role
+  let navItems = [];
+
+  if (!user || user.role === 'citizen') {
+    navItems = [
+      { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+      { path: '/report', icon: FileText, label: 'Report Issue' },
+      { path: '/track', icon: Search, label: 'Track Complaint' },
+      { path: '/map', icon: Map, label: 'City Map' },
+      { path: '/trending', icon: TrendingUp, label: 'Trending Issues' },
+    ];
+  } else if (user.role === 'government') {
+    navItems = [
+      { path: '/government', icon: LayoutDashboard, label: 'City Overview' },
+      { path: '/government/complaints', icon: FileText, label: 'Complaint Management' },
+      { path: '/map', icon: Map, label: 'City Map' },
+      { path: '/trending', icon: TrendingUp, label: 'Trending Issues' },
+    ];
+  } else if (user.role === 'news') {
+    navItems = [
+      { path: '/news', icon: TrendingUp, label: 'City Trends' },
+      { path: '/news/analytics', icon: FileText, label: 'Issue Analytics' },
+      { path: '/map', icon: Map, label: 'City Map' },
+    ];
+  }
 
   const isActive = (path) => location.pathname === path;
 

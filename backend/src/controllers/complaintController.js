@@ -38,17 +38,21 @@ async function createComplaint(req, res, next) {
     logger.debug({ category, priority }, 'Inserting complaint into database');
     const insertQuery = `
       INSERT INTO complaints (
-        description, category, priority, status, location, image_url
+        user_id, description, category, priority, status, location, image_url
       )
       VALUES (
-        $1, $2, $3, 'pending', 
-        ST_SetSRID(ST_MakePoint($4, $5), 4326)::geography,
-        $6
+        $1, $2, $3, $4, 'pending', 
+        ST_SetSRID(ST_MakePoint($5, $6), 4326)::geography,
+        $7
       )
       RETURNING complaint_id, category, priority, status, created_at
     `;
 
+    // Extract user_id if the user is authenticated (added via authMiddleware if present route)
+    const user_id = req.user ? req.user.user_id : null;
+
     const result = await db.query(insertQuery, [
+      user_id,
       description,
       category,
       priority,
@@ -265,10 +269,44 @@ async function getAllComplaints(req, res, next) {
   }
 }
 
+/**
+ * Get all complaints for the currently authenticated user
+ * GET /api/complaints/me
+ */
+async function getMyComplaints(req, res, next) {
+  try {
+    const user_id = req.user.user_id;
+    
+    const query = `
+      SELECT 
+        complaint_id,
+        category,
+        priority,
+        status,
+        ST_Y(location::geometry) as latitude,
+        ST_X(location::geometry) as longitude,
+        created_at,
+        updated_at
+      FROM complaints
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+    `;
+
+    const result = await db.query(query, [user_id]);
+
+    res.status(200).json(result.rows);
+
+  } catch (error) {
+    logger.error({ error, user_id: req.user.user_id }, 'Error retrieving user complaints');
+    return next(new DatabaseError('Failed to retrieve your complaints'));
+  }
+}
+
 module.exports = {
   createComplaint,
   getComplaint,
   getAllComplaints,
+  getMyComplaints,
   updateComplaintStatus,
   getTrending,
   getHeatmapData

@@ -13,7 +13,9 @@ import GovernmentLogin from './pages/GovernmentLogin';
 import NewsLogin from './pages/NewsLogin';
 import Register from './pages/Register';
 import GovernmentDashboard from './pages/GovernmentDashboard';
+import ComplaintManagement from './pages/ComplaintManagement';
 import NewsDashboard from './pages/NewsDashboard';
+import IssueAnalytics from './pages/IssueAnalytics';
 import Unauthorized from './pages/Unauthorized';
 
 function App() {
@@ -55,10 +57,26 @@ function App() {
                 }
               />
               <Route
+                path="/government/complaints"
+                element={
+                  <ProtectedRoute requiredRole="government">
+                    <ComplaintManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/news"
                 element={
                   <ProtectedRoute requiredRole="news">
                     <NewsDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/news/analytics"
+                element={
+                  <ProtectedRoute requiredRole="news">
+                    <IssueAnalytics />
                   </ProtectedRoute>
                 }
               />

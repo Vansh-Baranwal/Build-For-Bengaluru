@@ -119,6 +119,16 @@ export const api = {
     return handleResponse(response);
   },
 
+  // Get current user's personal complaints (requires authentication - citizen)
+  async getMyComplaints() {
+    const response = await fetch(`${API_BASE_URL}/complaints/me`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    return handleResponse(response);
+  },
+
   // Update complaint status (requires authentication - government only)
   async updateComplaintStatus(id, status) {
     const response = await fetch(`${API_BASE_URL}/complaints/${id}/status`, {

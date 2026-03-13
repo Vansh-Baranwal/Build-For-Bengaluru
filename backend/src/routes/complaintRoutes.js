@@ -12,6 +12,17 @@ const { complaintRateLimiter } = require('../middlewares/rateLimiter');
 const authMiddleware = require('../middlewares/authMiddleware');
 const requireRole = require('../middlewares/roleMiddleware');
 
+const optionalAuthMiddleware = (req, res, next) => {
+  // If no auth header exists, just continue anonymously
+  if (!req.header('Authorization')) return next();
+  // Otherwise try to verify it using the strict middleware
+  return authMiddleware(req, res, (err) => {
+    // If verification fails (e.g. invalid token), ignore and proceed anonymously
+    if (err) return next();
+    next();
+  });
+};
+
 /**
  * POST /api/complaints
  * Create a new complaint
@@ -21,10 +32,21 @@ const requireRole = require('../middlewares/roleMiddleware');
  */
 router.post(
   '/complaints',
+  optionalAuthMiddleware,
   complaintRateLimiter,
   validateComplaintSubmission,
   handleValidationErrors,
   complaintController.createComplaint
+);
+
+/**
+ * GET /api/complaints/me
+ * Get all complaints submitted by the authenticated citizen
+ */
+router.get(
+  '/complaints/me',
+  authMiddleware,
+  complaintController.getMyComplaints
 );
 
 /**
