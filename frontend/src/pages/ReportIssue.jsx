@@ -50,7 +50,6 @@ export default function ReportIssue() {
     description: '',
     latitude: '',
     longitude: '',
-    image_url: '',
   });
   const [position, setPosition] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -160,7 +159,6 @@ export default function ReportIssue() {
         description: '',
         latitude: '',
         longitude: '',
-        image_url: '',
       });
       setSelectedFile(null);
       setPreviewUrl(null);
@@ -281,10 +279,10 @@ export default function ReportIssue() {
             <span>{gettingLocation ? 'Getting location...' : 'Use My Location'}</span>
           </button>
 
-          {/* Image Upload */}
+          {/* Photo Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Upload Evidence Image (Optional)
+              Upload a Photo of the Issue
             </label>
             
             {!previewUrl ? (

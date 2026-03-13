@@ -92,19 +92,29 @@ export default function VoiceRecorder({ onRecordingComplete, onRemove }) {
         <button
           type="button"
           onClick={startRecording}
-          className="w-full flex items-center justify-center py-4 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+          className="w-full flex items-center justify-center py-6 border-2 border-dashed border-blue-400 rounded-xl text-blue-600 hover:bg-blue-50 hover:border-blue-500 transition-all group scale-100 hover:scale-[1.01]"
         >
-          <Mic className="w-6 h-6 mr-2" />
-          <span className="font-medium">Record Audio Description</span>
+          <div className="bg-blue-100 p-3 rounded-full mr-4 group-hover:bg-blue-200 transition-colors">
+            <Mic className="w-8 h-8 text-blue-600" />
+          </div>
+          <div className="text-left">
+            <span className="block font-bold text-lg">Record Voice Complaint</span>
+            <span className="block text-sm text-blue-500">Click to start recording your voice</span>
+          </div>
         </button>
       ) : isRecording ? (
         <button
           type="button"
           onClick={stopRecording}
-          className="w-full flex items-center justify-center py-4 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+          className="w-full flex items-center justify-center py-6 bg-red-50 border-2 border-red-200 rounded-xl text-red-600 hover:bg-red-100 transition-all animate-pulse"
         >
-          <Square className="w-6 h-6 mr-2 fill-current" />
-          <span className="font-medium">Stop Recording</span>
+          <div className="bg-red-200 p-3 rounded-full mr-4">
+            <Square className="w-8 h-8 text-red-600 fill-current" />
+          </div>
+          <div className="text-left">
+            <span className="block font-bold text-lg">Stop Recording</span>
+            <span className="block text-sm text-red-500">Listening to your description...</span>
+          </div>
         </button>
       ) : (
         <div className="flex items-center space-x-3 bg-white p-3 rounded-md border border-gray-200">
