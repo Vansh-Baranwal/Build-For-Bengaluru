@@ -65,14 +65,20 @@ const emailService = {
     };
 
     try {
-      // For actual production, use this.transporter.sendMail(mailOptions)
-      // Since we don't have real SMTP creds, we'll log the intention
-      logger.info({ 
-        to: higherAuthorityEmail, 
-        complaint_id: complaint.complaint_id 
-      }, '📧 Escalation Email Triggered (SMTP simulation)');
-      
-      // In a real environment, you would await this.transporter.sendMail(mailOptions);
+      // For actual production, we use the transporter
+      if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+        await this.transporter.sendMail(mailOptions);
+        logger.info({ 
+          to: higherAuthorityEmail, 
+          complaint_id: complaint.complaint_id 
+        }, '📧 Escalation Email Sent Successfully');
+      } else {
+        // Fallback to simulation if credentials are missing
+        logger.warn({ 
+          to: higherAuthorityEmail, 
+          complaint_id: complaint.complaint_id 
+        }, '📧 SMTP credentials missing - Simulation Successful (Check .env)');
+      }
       return true;
     } catch (error) {
       logger.error({ error: error.message }, 'Failed to send escalation email');
