@@ -23,7 +23,7 @@ export default function Navbar({ onMenuClick }) {
             className="flex items-center"
           >
             <img 
-              src="/src/assets/logo.png" 
+              src="/logo.png" 
               alt="NammaFix Logo" 
               className="h-12 w-auto drop-shadow-[0_0_15px_rgba(99,102,241,0.3)] group-hover:drop-shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all"
             />

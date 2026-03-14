@@ -58,7 +58,7 @@ const Register = () => {
           <div className="flex justify-center mb-6">
             <motion.img 
               whileHover={{ scale: 1.05 }}
-              src="/src/assets/logo.png" 
+              src="/logo.png" 
               alt="NammaFix Logo" 
               className="h-24 w-auto drop-shadow-[0_0_20px_rgba(99,102,241,0.3)]"
             />
