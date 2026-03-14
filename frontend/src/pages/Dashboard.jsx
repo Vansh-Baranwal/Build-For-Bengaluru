@@ -185,7 +185,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full">
         {/* Header Section */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}

@@ -106,12 +106,12 @@ const GovernmentDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex min-h-full w-full">
       {/* Sidebar - Visual only for branding */}
       <motion.aside 
         initial={{ x: -100 }}
         animate={{ x: 0 }}
-        className="w-20 lg:w-72 glass-panel m-6 rounded-[3rem] border-white/5 text-white flex flex-col items-center lg:items-start py-10 transition-all duration-300 z-10 shadow-3xl"
+        className="w-20 lg:w-72 glass-panel lg:my-0 my-6 lg:rounded-none rounded-[3rem] border-white/5 text-white flex flex-col items-center lg:items-start py-10 transition-all duration-300 z-10 shadow-3xl"
       >
         <div className="px-8 mb-16 flex items-center gap-4">
           <div className="w-12 h-12 bg-white rounded-[1.25rem] flex items-center justify-center animate-float shadow-xl">
@@ -155,9 +155,8 @@ const GovernmentDashboard = () => {
         </div>
       </motion.aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-transparent relative custom-scrollbar">
-        <div className="w-full px-6 lg:px-10 py-12">
+      <main className="flex-1 overflow-x-hidden bg-transparent relative custom-scrollbar">
+        <div className="w-full px-4 lg:px-6 py-12">
           {/* Header */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
@@ -179,12 +178,12 @@ const GovernmentDashboard = () => {
             </div>
             
             <div className="flex items-center gap-6 bg-white/5 backdrop-blur-xl p-3 rounded-[2.5rem] border border-white/5 shadow-2xl">
-              <div className="relative">
+              <div className="relative w-full sm:w-80">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500" />
                 <input 
                   type="text" 
                   placeholder="Scan incident IDs..."
-                  className="bg-white/5 border border-white/5 rounded-[1.75rem] pl-14 pr-8 py-4 text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-indigo-500 w-80 transition-all outline-none placeholder:text-slate-600 text-white"
+                  className="bg-white/5 border border-white/5 rounded-[1.75rem] pl-14 pr-8 py-4 text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-indigo-500 w-full transition-all outline-none placeholder:text-slate-600 text-white"
                 />
               </div>
               <button className="bg-white text-slate-900 w-14 h-14 rounded-[1.5rem] flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl">
@@ -198,7 +197,7 @@ const GovernmentDashboard = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16"
           >
             {[
               { label: 'Incident Vector', value: stats.total, icon: BarChart3, color: 'indigo' },

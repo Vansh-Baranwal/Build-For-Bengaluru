@@ -18,7 +18,7 @@ const MainLayout = () => {
 
       <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
       
-      <div className="flex pt-32 px-6 pb-12 max-w-7xl mx-auto">
+      <div className="flex pt-32 px-6 lg:px-12 pb-12 w-full">
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         
         <main className="flex-1 lg:ml-8">

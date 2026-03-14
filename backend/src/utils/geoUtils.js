@@ -99,8 +99,8 @@ async function assignToCluster(complaintId, longitude, latitude, category) {
     } else {
       // Create new cluster
       const createClusterQuery = `
-        INSERT INTO clusters (issue_type, location, complaint_count)
-        VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), 4326)::geography, 1)
+        INSERT INTO clusters (issue_type, latitude, longitude, complaint_count)
+        VALUES ($1, $3, $2, 1)
         RETURNING cluster_id
       `;
 
