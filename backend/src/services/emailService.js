@@ -28,7 +28,7 @@ const emailService = {
     const higherAuthorityEmail = 'vanshbaranwal21@gmail.com';
     
     const mailOptions = {
-      from: '"NammaFix System" <noreply@nammafix.gov.in>',
+      from: `"NammaFix System" <${process.env.SMTP_USER}>`,
       to: higherAuthorityEmail,
       subject: `🚨 CRITICAL: SLA Breach - Case #${complaint.complaint_id.slice(0, 8)}`,
       html: `

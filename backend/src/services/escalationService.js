@@ -52,20 +52,30 @@ const escalationService = {
       const toEscalate = await db.query(selectQuery);
       
       if (toEscalate.rows.length > 0) {
-        logger.info({ count: toEscalate.rows.length }, 'Found complaints for escalation');
+        logger.info({ 
+          count: toEscalate.rows.length,
+          sample_id: toEscalate.rows[0].complaint_id 
+        }, 'Found complaints for escalation - Processing loop');
 
         for (const complaint of toEscalate.rows) {
-          // 2. Perform the database update
-          await db.query(`
-            UPDATE public.complaints 
-            SET is_escalated = TRUE 
-            WHERE complaint_id = $1
-          `, [complaint.complaint_id]);
+          try {
+            // 2. Perform the database update
+            await db.query(`
+              UPDATE public.complaints 
+              SET is_escalated = TRUE 
+              WHERE complaint_id = $1
+            `, [complaint.complaint_id]);
 
-          // 3. Trigger the email alert
-          await emailService.sendEscalationAlert(complaint);
-          
-          logger.info({ id: complaint.complaint_id }, 'Escalation complete for complaint');
+            // 3. Trigger the email alert
+            await emailService.sendEscalationAlert(complaint);
+            
+            logger.info({ id: complaint.complaint_id }, 'Escalation complete for complaint');
+          } catch (itemError) {
+            logger.error({ 
+              id: complaint.complaint_id, 
+              error: itemError.message 
+            }, 'Failed to process individual escalation');
+          }
         }
       } else {
         logger.info('No new escalations found.');
