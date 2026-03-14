@@ -39,9 +39,9 @@ Your task is to analyze the evidence and return a JSON object with the following
 - issue_type: one of [Emergency, Recurring, Regular Problem, Trends]
 
 Classification Logic:
-1. BBMP: Roads, structural issues, construction, illegal buildings, water/drainage.
-2. Traffic Police: Anything related to vehicle movement, signals, parking, or accidents.
-3. Cleaning Work: Garbage collection, sewage overflow, animal carcasses, public toilets.
+1. BBMP: STRICTLY for Road related works (potholes, street lights, broken pavements), illegal construction, or building structural issues.
+2. Traffic Police: Anything related to vehicle movement, signals, traffic jams, illegal parking, or accidents.
+3. Cleaning Work: STRICTLY for Garbage complaints, waste collection, sewage overflow, or sanitation.
 4. Others: Any civic issue not fitting above.
 
 Issue Type Logic:
