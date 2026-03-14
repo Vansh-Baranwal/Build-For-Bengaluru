@@ -83,9 +83,11 @@ Citizens can easily report and track civic problems.
 
 ### Screenshots
 
-![](screenshots/1.png)
-![](screenshots/2.png)
-![](screenshots/3.png)
+<p align="center">
+<img src="Screenshots/1.png" width="45%">
+<img src="Screenshots/2.png" width="45%">
+<img src="Screenshots/3.png" width="45%">
+</p>
 
 ---
 
