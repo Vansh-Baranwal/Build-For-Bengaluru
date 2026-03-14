@@ -130,6 +130,18 @@ router.get('/news', complaintController.getCityNews);
  */
 router.get('/complaints-nearby', authMiddleware, complaintController.getNearbyComplaints);
 /**
+ * POST /api/complaints/:id/verify
+ * Submit community verification (Yes/No)
+ */
+router.post(
+  '/complaints/:id/verify',
+  authMiddleware,
+  validateComplaintId,
+  handleValidationErrors,
+  complaintController.verifyComplaint
+);
+
+/**
  * POST /api/complaints/:id/feedback
  * Submit feedback for a resolved complaint
  */
