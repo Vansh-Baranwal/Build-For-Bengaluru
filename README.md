@@ -35,7 +35,8 @@ NammaFix creates a **collaborative ecosystem between citizens, government, and m
 
 ---
 
-# 🎥 Demo
+# 🎥 MVP Link
+https://build-for-bengaluru.vercel.app/
 
 🚀 **Live Backend API**
 
@@ -79,6 +80,9 @@ Citizens can easily report and track civic problems.
 - Track Complaint
 - City Map
 - Trending Issues
+
+### Screenshots
+
 
 ---
 
