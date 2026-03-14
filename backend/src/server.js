@@ -19,7 +19,6 @@ const cors = require('cors');
 
 // CORS Middleware
 const allowedOrigins = [
-  'http://localhost:5173',
   'https://build-for-bengaluru.vercel.app'
 ];
 app.use(cors({
@@ -131,8 +130,8 @@ async function startServer() {
       logger.info({
         port: PORT,
         environment: config.server.nodeEnv,
-        healthCheck: `http://localhost:${PORT}/health`,
-        apiEndpoint: `http://localhost:${PORT}/api`
+        healthCheck: `https://build-for-bengaluru.onrender.com/health`,
+        apiEndpoint: `https://build-for-bengaluru.onrender.com/api`
       }, 'NammaFix Backend started successfully');
     });
     

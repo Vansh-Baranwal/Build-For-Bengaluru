@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../database/db');
 const config = require('../config/env');
 const logger = require('../config/logger');
-const { ValidationError } = require('../middlewares/errorHandler');
+const { ValidationError, UnauthorizedError } = require('../middlewares/errorHandler');
 
 /**
  * Register a new user
@@ -151,7 +151,7 @@ async function getProfile(req, res, next) {
     );
 
     if (result.rows.length === 0) {
-      throw new ValidationError('User not found');
+      throw new UnauthorizedError('User not found');
     }
 
     res.status(200).json(result.rows[0]);

@@ -13,6 +13,14 @@ class ValidationError extends Error {
   }
 }
 
+class UnauthorizedError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'UnauthorizedError';
+    this.statusCode = 401;
+  }
+}
+
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
@@ -93,6 +101,7 @@ module.exports = {
   errorHandler,
   notFoundHandler,
   ValidationError,
+  UnauthorizedError,
   NotFoundError,
   AIServiceError,
   DatabaseError
