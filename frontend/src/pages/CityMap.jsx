@@ -68,17 +68,17 @@ export default function CityMap() {
   const center = [12.9716, 77.5946]; // Bengaluru
 
   return (
-    <div className="h-[calc(100vh-4rem)]">
-      <div className="h-full relative">
+    <div className="h-[calc(100vh-5rem)] p-4 md:p-10">
+      <div className="h-full relative glass-panel rounded-[3.5rem] overflow-hidden border-white/40 shadow-3xl bg-white/10 backdrop-blur-md">
         <MapContainer
           center={center}
           zoom={12}
-          className="h-full w-full"
-          zoomControl={true}
+          className="h-full w-full grayscale-[0.2] contrast-[1.1]"
+          zoomControl={false}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            url="https://{s}.tile.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
 
           {/* Complaint Markers with Clustering */}
@@ -93,17 +93,17 @@ export default function CityMap() {
                 position={[complaint.latitude, complaint.longitude]}
                 icon={getMarkerIcon(complaint.category)}
               >
-                <Popup>
-                  <div className="p-2">
-                    <h3 className="font-semibold text-gray-900 capitalize mb-2">
+                <Popup className="premium-popup">
+                  <div className="p-4 glass-card border-white/50 bg-white/80">
+                    <h3 className="font-black text-slate-900 uppercase text-xs tracking-tighter mb-4">
                       {complaint.category}
                     </h3>
-                    <div className="space-y-1">
+                    <div className="space-y-3">
                       <div>
                         <PriorityBadge priority={complaint.priority} />
                       </div>
-                      <p className="text-xs text-gray-600">
-                        Location: {complaint.latitude.toFixed(4)}, {complaint.longitude.toFixed(4)}
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-loose">
+                        COORDINATES: <br/> {complaint.latitude.toFixed(5)} / {complaint.longitude.toFixed(5)}
                       </p>
                     </div>
                   </div>
@@ -120,19 +120,22 @@ export default function CityMap() {
               radius={200}
               pathOptions={{
                 fillColor: complaint.priority === 'high' ? '#ef4444' : complaint.priority === 'medium' ? '#f97316' : '#22c55e',
-                fillOpacity: 0.1,
+                fillOpacity: 0.15,
                 color: complaint.priority === 'high' ? '#ef4444' : complaint.priority === 'medium' ? '#f97316' : '#22c55e',
                 weight: 1,
-                opacity: 0.3,
+                opacity: 0.4,
               }}
             />
           ))}
         </MapContainer>
 
         {/* Legend */}
-        <div className="absolute bottom-6 right-6 bg-white rounded-lg shadow-lg p-4 z-[1000]">
-          <h3 className="font-semibold text-gray-900 mb-3 text-sm">Issue Categories</h3>
-          <div className="space-y-2">
+        <div className="absolute top-10 right-10 glass-card rounded-[2.5rem] p-8 z-[1000] border-white/40 shadow-3xl min-w-[240px] bg-white/40 backdrop-blur-2xl">
+          <div className="flex items-center gap-3 mb-6">
+             <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+             <h3 className="font-black text-slate-900 uppercase text-[10px] tracking-[0.2em]">Matrix Legend</h3>
+          </div>
+          <div className="space-y-4">
             {[
               { name: 'Pothole', color: '#ef4444' },
               { name: 'Garbage', color: '#f97316' },
@@ -140,20 +143,28 @@ export default function CityMap() {
               { name: 'Drainage', color: '#a855f7' },
               { name: 'Streetlight', color: '#eab308' },
             ].map((item) => (
-              <div key={item.name} className="flex items-center space-x-2">
+              <div key={item.name} className="flex items-center justify-between">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.name}</span>
                 <div
-                  className="w-4 h-4 rounded-full border-2 border-white shadow"
+                  className="w-5 h-5 rounded-lg border-2 border-white shadow-xl rotate-12 group-hover:rotate-0 transition-transform"
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-xs text-gray-700">{item.name}</span>
               </div>
             ))}
           </div>
-          <div className="mt-3 pt-3 border-t border-gray-200">
-            <p className="text-xs text-gray-600">
-              Total Complaints: <span className="font-semibold">{complaints.length}</span>
+          <div className="mt-8 pt-6 border-t border-slate-900/5">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              Total Signals: <span className="text-slate-900 ml-2">{complaints.length}</span>
             </p>
           </div>
+        </div>
+
+        {/* Header Overlay */}
+        <div className="absolute top-10 left-10 z-[1000]">
+           <div className="glass-card rounded-2xl px-6 py-3 border-white/40 shadow-2xl flex items-center gap-4 bg-white/40 backdrop-blur-xl">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+              <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest underline decoration-indigo-500 decoration-2 underline-offset-4">Bengaluru Live Feed</span>
+           </div>
         </div>
       </div>
     </div>

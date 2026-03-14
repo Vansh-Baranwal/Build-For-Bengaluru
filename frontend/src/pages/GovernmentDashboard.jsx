@@ -106,69 +106,89 @@ const GovernmentDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar - Visual only for branding */}
       <motion.aside 
         initial={{ x: -100 }}
         animate={{ x: 0 }}
-        className="w-20 lg:w-64 bg-slate-900 text-white flex flex-col items-center lg:items-start py-8 transition-all duration-300 z-10"
+        className="w-20 lg:w-72 glass-panel m-6 rounded-[3rem] border-white/20 text-slate-900 flex flex-col items-center lg:items-start py-10 transition-all duration-300 z-10 shadow-3xl"
       >
-        <div className="px-6 mb-12 flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-500 rounded-2xl flex items-center justify-center animate-float">
-            <Building2 className="w-6 h-6" />
+        <div className="px-8 mb-16 flex items-center gap-4">
+          <div className="w-12 h-12 bg-slate-900 rounded-[1.25rem] flex items-center justify-center animate-float shadow-xl">
+            <Building2 className="w-6 h-6 text-indigo-400" />
           </div>
-          <span className="hidden lg:block text-xl font-black tracking-tighter">NAMMA<span className="text-indigo-400">FIX</span></span>
+          <div className="hidden lg:block">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 leading-none mb-1">Government</p>
+            <span className="text-2xl font-black tracking-tighter text-slate-900 uppercase">NAMMA<span className="text-indigo-600">FIX</span></span>
+          </div>
         </div>
         
-        <nav className="flex-1 w-full space-y-2 px-3">
+        <nav className="flex-1 w-full space-y-3 px-4">
+          <p className="hidden lg:block px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">Operations Sectors</p>
           {departments.map((dept) => (
             <button
               key={dept.id}
               onClick={() => setActiveTab(dept.id)}
-              className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl transition-all duration-300 group ${
+              className={`w-full flex items-center gap-4 px-5 py-5 rounded-[1.5rem] transition-all duration-500 group ${
                 activeTab === dept.id 
-                  ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-900/40' 
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                  ? 'bg-slate-900 text-white shadow-2xl shadow-slate-900/20' 
+                  : 'text-slate-500 hover:bg-white/60 hover:text-slate-900'
               }`}
             >
-              <dept.icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110`} />
-              <span className="hidden lg:block text-xs font-black uppercase tracking-widest text-left ml-2">{dept.name}</span>
+              <dept.icon className={`w-5 h-5 transition-transform duration-500 group-hover:scale-110 ${activeTab === dept.id ? 'text-indigo-400' : 'text-slate-400'}`} />
+              <span className="hidden lg:block text-[11px] font-black uppercase tracking-widest text-left">{dept.name}</span>
+              {activeTab === dept.id && (
+                <motion.div layoutId="activeDept" className="ml-auto w-1.5 h-1.5 bg-indigo-400 rounded-full" />
+              )}
             </button>
           ))}
         </nav>
+
+        <div className="mt-auto px-6 w-full">
+           <div className="bg-slate-900/5 rounded-3xl p-6 border border-slate-900/5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">System Status</p>
+              </div>
+              <p className="text-[10px] font-bold text-slate-900 uppercase tracking-tighter">All Nodes Operational</p>
+           </div>
+        </div>
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-transparent relative">
-        <div className="max-w-7xl mx-auto px-8 py-10">
+      <main className="flex-1 overflow-y-auto bg-transparent relative custom-scrollbar">
+        <div className="max-w-7xl mx-auto px-10 py-12">
           {/* Header */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12"
+            className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-16"
           >
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600">Administrative Portal</span>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="px-3 py-1 bg-indigo-600 rounded-full">
+                   <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white">Security Level Alpha</span>
+                </div>
+                <div className="w-1.5 h-1.5 bg-slate-300 rounded-full"></div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Node: BLR-CENTRAL-01</span>
               </div>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none mb-2">
-                Unified <span className="text-gradient">Command Center</span>
+              <h1 className="text-6xl font-black text-slate-900 tracking-tighter leading-none mb-4 uppercase">
+                Unified <span className="text-gradient">Command</span>
               </h1>
-              <p className="text-slate-500 text-sm font-medium">Monitoring civic health and departmental response times.</p>
+              <p className="text-slate-500 text-xs font-black uppercase tracking-widest opacity-60">Bengaluru Civic Response & Intelligence Matrix</p>
             </div>
             
-            <div className="flex items-center gap-4 bg-white/50 backdrop-blur-md p-2 rounded-3xl border border-white/50 shadow-sm">
+            <div className="flex items-center gap-6 bg-white/40 backdrop-blur-xl p-3 rounded-[2.5rem] border border-white shadow-2xl">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
                 <input 
                   type="text" 
-                  placeholder="Search incidents..."
-                  className="bg-slate-100 border-none rounded-2xl pl-11 pr-6 py-3 text-xs font-bold focus:ring-2 focus:ring-indigo-500 w-64 transition-all"
+                  placeholder="Scan incident IDs..."
+                  className="bg-slate-900/5 border-none rounded-[1.75rem] pl-14 pr-8 py-4 text-xs font-black uppercase tracking-widest focus:ring-2 focus:ring-indigo-500 w-80 transition-all outline-none placeholder:text-slate-400"
                 />
               </div>
-              <button className="bg-slate-900 text-white p-3 rounded-2xl hover:scale-110 transition-transform">
-                <Filter className="w-4 h-4" />
+              <button className="bg-slate-900 text-white w-14 h-14 rounded-[1.5rem] flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl shadow-slate-900/20">
+                <Filter className="w-5 h-5" />
               </button>
             </div>
           </motion.div>
@@ -178,10 +198,10 @@ const GovernmentDashboard = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12"
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16"
           >
             {[
-              { label: 'Total Incidents', value: stats.total, icon: BarChart3, color: 'indigo' },
+              { label: 'Incident Vector', value: stats.total, icon: BarChart3, color: 'indigo' },
               { label: 'SLA Breaches', value: stats.urgent, icon: AlertTriangle, color: 'rose' },
               { label: 'Active Tasks', value: stats.active, icon: TrendingUp, color: 'blue' },
               { label: 'Resolved', value: stats.resolved, icon: CheckCircle2, color: 'emerald' },
@@ -189,45 +209,62 @@ const GovernmentDashboard = () => {
               <motion.div 
                 key={i}
                 variants={itemVariants}
-                whileHover={{ y: -5, scale: 1.02 }}
-                className="stat-card"
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="glass-card rounded-[2.5rem] p-8 border-white/40 shadow-2xl relative overflow-hidden group"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className={`p-3 rounded-2xl bg-${stat.color}-50`}>
-                    <stat.icon className={`w-5 h-5 text-${stat.color}-600`} />
+                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-indigo-500/10 transition-colors"></div>
+                <div className="flex justify-between items-start mb-6">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center bg-slate-100 shadow-inner`}>
+                    <stat.icon className={`w-6 h-6 text-slate-900`} />
                   </div>
-                  <span className={`text-${stat.color}-600 bg-${stat.color}-100/50 px-2 py-1 rounded-lg text-[10px] font-black`}>+12%</span>
+                  <div className="flex flex-col items-end">
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${
+                      stat.color === 'rose' ? 'text-rose-600' : 
+                      stat.color === 'emerald' ? 'text-emerald-600' : 'text-indigo-600'}`}>+12.4%</span>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">v/s Last 24h</p>
+                  </div>
                 </div>
-                <p className="text-3xl font-black text-slate-800 leading-none mb-1">{stat.value}</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</p>
+                <p className="text-4xl font-black text-slate-900 tracking-tighter leading-none mb-2">{stat.value}</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>
 
-          <div className="flex flex-col lg:flex-row gap-10">
+          <div className="flex flex-col lg:flex-row gap-12">
             {/* Filters Sidebar */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="lg:w-48 space-y-6"
+              className="lg:w-60 space-y-8"
             >
               <div>
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 px-2">Issue Priority</h3>
-                <div className="space-y-1">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 px-4">Priority Filter</h3>
+                <div className="space-y-2">
                   {filters.map((f) => (
                     <button
                       key={f}
                       onClick={() => setActiveFilter(f)}
-                      className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition-all duration-300 ${
+                      className={`w-full text-left px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-500 relative overflow-hidden group ${
                         activeFilter === f 
-                          ? 'bg-white text-indigo-600 shadow-lg shadow-indigo-100' 
-                          : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
+                          ? 'bg-slate-900 text-white shadow-2xl shadow-slate-900/20' 
+                          : 'text-slate-500 hover:text-slate-900 hover:bg-white/60'
                       }`}
                     >
-                      {f}
+                      <span className="relative z-10">{f}</span>
+                      {activeFilter === f && (
+                        <motion.div layoutId="activeFilterBlob" className="absolute left-0 top-0 w-1 h-full bg-indigo-400" />
+                      )}
                     </button>
                   ))}
                 </div>
+              </div>
+
+              <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden">
+                <div className="relative z-10">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400 mb-4">Intelligence Note</h4>
+                  <p className="text-xs font-bold leading-relaxed text-indigo-100 uppercase tracking-tighter">Emergency reports require response initiation within 300 seconds as per Protocol 7.</p>
+                </div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
               </div>
             </motion.div>
 
@@ -240,10 +277,10 @@ const GovernmentDashboard = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex flex-col items-center justify-center py-20"
+                    className="flex flex-col items-center justify-center py-32"
                   >
-                    <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-                    <p className="text-xs font-black uppercase tracking-widest text-slate-400">Fetching Intelligence...</p>
+                    <div className="w-16 h-16 border-[6px] border-slate-900/5 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 animate-pulse">Syncing Data Streams...</p>
                   </motion.div>
                 ) : (
                   <motion.div 
@@ -251,91 +288,100 @@ const GovernmentDashboard = () => {
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="grid grid-cols-1 gap-6"
+                    className="grid grid-cols-1 gap-8"
                   >
                     {filteredComplaints.length === 0 ? (
-                      <div className="text-center py-20 bg-white/30 backdrop-blur-sm rounded-3xl border-2 border-dashed border-slate-200">
-                        <Users className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                        <p className="text-slate-500 font-bold">No active incidents found in this sector.</p>
+                      <div className="text-center py-32 glass-card rounded-[3.5rem] border-2 border-dashed border-slate-200/50">
+                        <Users className="w-16 h-16 text-slate-200 mx-auto mb-6" />
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Zero incidents detected in this sector.</p>
                       </div>
                     ) : (
                       filteredComplaints.map((complaint) => (
                         <motion.div
                           key={complaint.complaint_id}
                           variants={itemVariants}
-                          whileHover={{ scale: 1.01, x: 5 }}
-                          className={`group glass-card rounded-[2rem] p-8 transition-all duration-500 hover:border-indigo-200 ${
-                            complaint.is_escalated ? 'ring-2 ring-rose-500/20' : ''
+                          whileHover={{ scale: 1.01, x: 8 }}
+                          className={`group glass-card rounded-[3.5rem] p-10 transition-all duration-700 hover:border-white relative ${
+                            complaint.is_escalated ? 'ring-4 ring-rose-500/10' : ''
                           }`}
                         >
-                          <div className="flex flex-col md:flex-row gap-8">
-                            <div className="w-full md:w-56 h-44 rounded-2xl overflow-hidden relative shadow-inner">
+                          <div className="flex flex-col xl:flex-row gap-10">
+                            <div className="w-full xl:w-72 h-56 rounded-[2.5rem] overflow-hidden relative shadow-2xl">
                               <img 
                                 src={complaint.image_url || 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800'} 
                                 alt="Incident Evidence" 
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1500ms]"
                               />
-                              <div className="absolute top-3 left-3 flex gap-2">
-                                <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest backdrop-blur-md ${
+                              <div className="absolute top-4 left-4 flex gap-2">
+                                <span className={`px-4 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest backdrop-blur-xl border border-white/20 ${
                                   complaint.priority === 'high' || complaint.issue_type === 'Emergency'
-                                    ? 'bg-rose-500/90 text-white' 
-                                    : 'bg-white/90 text-slate-900'
+                                    ? 'bg-rose-600 text-white' 
+                                    : 'bg-white/90 text-slate-900 shadow-xl'
                                 }`}>
                                   {complaint.issue_type}
                                 </span>
                               </div>
                             </div>
 
-                            <div className="flex-1 flex flex-col">
-                              <div className="flex justify-between items-start mb-4">
-                                <div>
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <span className="text-[10px] font-black text-indigo-600 tracking-tighter uppercase tracking-widest">Case #{complaint.complaint_id.slice(0, 8)}</span>
-                                    <div className="flex items-center gap-2 bg-slate-100 px-2 py-1 rounded-lg">
-                                      <span className="text-[9px] font-bold text-slate-500 uppercase">Reporter Level:</span>
+                            <div className="flex-1 flex flex-col justify-between">
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-4">
+                                    <span className="text-[11px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100">Case ID: {complaint.complaint_id.slice(0, 8)}</span>
+                                    <div className="flex items-center gap-3 bg-slate-900/5 px-4 py-2 rounded-2xl border border-slate-900/5">
+                                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Reporter Integrity</span>
                                       <StarRating score={complaint.reporter_reputation || 50} />
                                     </div>
                                   </div>
-                                  <h3 className="text-xl font-black text-slate-900 leading-tight mb-2 group-hover:text-indigo-600 transition-colors">{complaint.category}</h3>
-                                  <p className="text-slate-500 text-sm font-medium line-clamp-2 mb-4 leading-relaxed">{complaint.description}</p>
+                                  <div className="text-right">
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Entry Timestamp</p>
+                                    <p className="text-xs font-black text-slate-900">{new Date(complaint.created_at).toLocaleString()}</p>
+                                  </div>
                                 </div>
-                                <div className="text-right">
-                                  <span className="text-[10px] font-black text-slate-400 block mb-1">RECEIVED</span>
-                                  <span className="text-xs font-bold text-slate-900">{new Date(complaint.created_at).toLocaleDateString()}</span>
-                                </div>
+
+                                <h3 className="text-3xl font-black text-slate-900 tracking-tight uppercase">{complaint.category}</h3>
+                                <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-2xl">{complaint.description}</p>
                               </div>
 
-                              <div className="mt-auto pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-6">
-                                <div className="flex items-center gap-6">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                                      {activeTab === 'BBMP' ? <Building2 className="w-4 h-4 text-slate-600" /> : 
-                                       activeTab === 'Traffic Police' ? <Car className="w-4 h-4 text-slate-600" /> : 
-                                       <Trash2 className="w-4 h-4 text-slate-600" />}
+                              <div className="pt-8 mt-8 border-t border-slate-100/50 flex flex-wrap items-center justify-between gap-8">
+                                <div className="flex items-center gap-8">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-[1.25rem] bg-slate-900 flex items-center justify-center shadow-lg">
+                                      {activeTab === 'BBMP' ? <Building2 className="w-5 h-5 text-indigo-400" /> : 
+                                       activeTab === 'Traffic Police' ? <Car className="w-5 h-5 text-indigo-400" /> : 
+                                       <Trash2 className="w-5 h-5 text-indigo-400" />}
                                     </div>
-                                    <span className="text-xs font-black uppercase tracking-widest text-slate-600">{activeTab}</span>
+                                    <div className="hidden sm:block">
+                                       <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Assigned Sector</p>
+                                       <span className="text-[10px] font-black uppercase tracking-wider text-slate-900">{activeTab}</span>
+                                    </div>
                                   </div>
                                   
-                                  <div className="flex items-center gap-2">
-                                    <div className={`w-2 h-2 rounded-full ${
+                                  <div className="flex items-center gap-3 py-2 px-4 bg-white/50 rounded-2xl border border-white">
+                                    <div className={`w-2.5 h-2.5 rounded-full animate-shimmer ${
                                       complaint.status === 'resolved' ? 'bg-emerald-500' :
                                       complaint.status === 'in_progress' ? 'bg-blue-500' : 'bg-amber-500'
                                     }`}></div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">{complaint.status.replace('_', ' ')}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-700">{complaint.status.replace('_', ' ')}</span>
                                   </div>
                                 </div>
 
-                                <div className="flex gap-3">
+                                <div className="flex gap-4">
                                   {complaint.status === 'pending' && (
-                                    <div className="flex items-center gap-2">
-                                      <select 
-                                        id={`deadline-${complaint.complaint_id}`}
-                                        className="bg-white border-2 border-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest px-4 py-3.5 rounded-2xl outline-none focus:border-indigo-300 transition-all cursor-pointer"
-                                      >
-                                        <option value="1">1 Minute</option>
-                                        <option value="2">2 Minutes</option>
-                                        <option value="5">5 Minutes</option>
-                                      </select>
+                                    <div className="flex items-center gap-4">
+                                      <div className="relative group">
+                                         <select 
+                                            id={`deadline-${complaint.complaint_id}`}
+                                            className="bg-white border-2 border-slate-100 text-slate-900 text-[10px] font-black uppercase tracking-widest pl-6 pr-12 py-4 rounded-[1.5rem] outline-none focus:border-indigo-400 transition-all cursor-pointer appearance-none min-w-[160px]"
+                                          >
+                                            <option value="1">1 MIN SLA</option>
+                                            <option value="2">2 MIN SLA</option>
+                                            <option value="5">5 MIN SLA</option>
+                                          </select>
+                                          <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-indigo-500 transition-colors">
+                                            <Clock className="w-4 h-4" />
+                                          </div>
+                                      </div>
                                       <button
                                         onClick={() => {
                                           const mins = document.getElementById(`deadline-${complaint.complaint_id}`).value;
@@ -344,9 +390,9 @@ const GovernmentDashboard = () => {
                                           handleStatusUpdate(complaint.complaint_id, 'in_progress', deadline.toISOString());
                                         }}
                                         disabled={updatingId === complaint.complaint_id}
-                                        className="btn-premium flex items-center gap-2"
+                                        className="btn-premium px-8 py-4 text-[10px] tracking-[0.2em]"
                                       >
-                                        Assign Officer
+                                        Deploy Unit
                                       </button>
                                     </div>
                                   )}
@@ -354,9 +400,9 @@ const GovernmentDashboard = () => {
                                     <button
                                       onClick={() => handleStatusUpdate(complaint.complaint_id, 'resolved')}
                                       disabled={updatingId === complaint.complaint_id}
-                                      className="bg-emerald-600 hover:bg-slate-900 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-emerald-100 active:scale-95 disabled:opacity-50"
+                                      className="bg-emerald-600 hover:bg-slate-900 text-white px-10 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-2xl shadow-emerald-100 active:scale-95 disabled:opacity-50"
                                     >
-                                      Verify & Resolve
+                                      Finalize Resolution
                                     </button>
                                   )}
                                 </div>
@@ -365,31 +411,32 @@ const GovernmentDashboard = () => {
                               <AnimatePresence>
                                 {complaint.deadline && complaint.status !== 'resolved' && (
                                   <motion.div 
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className={`mt-6 p-5 rounded-2xl flex items-center justify-between overflow-hidden ${
-                                      complaint.is_escalated ? 'bg-rose-50 border border-rose-100' : 'bg-slate-900'
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    className={`mt-8 p-6 rounded-[2rem] flex items-center justify-between overflow-hidden relative ${
+                                      complaint.is_escalated ? 'bg-rose-50 border-2 border-rose-100/50' : 'bg-slate-900 shadow-2xl'
                                     }`}
                                   >
-                                    <div className="flex items-center gap-4">
-                                      <div className={`p-2 rounded-xl ${complaint.is_escalated ? 'bg-rose-100' : 'bg-slate-800'}`}>
-                                        <Clock className={`w-4 h-4 ${complaint.is_escalated ? 'text-rose-600 animate-pulse' : 'text-indigo-400'}`} />
+                                    <div className="flex items-center gap-6 relative z-10">
+                                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${complaint.is_escalated ? 'bg-rose-100 shadow-inner' : 'bg-slate-800'}`}>
+                                        <Clock className={`w-6 h-6 ${complaint.is_escalated ? 'text-rose-600 animate-pulse' : 'text-indigo-400'}`} />
                                       </div>
                                       <div>
-                                        <p className={`text-[9px] font-black uppercase tracking-widest ${complaint.is_escalated ? 'text-rose-500' : 'text-slate-400'}`}>
-                                          {complaint.is_escalated ? 'SLA Critical Breach - Escalated' : 'Target Resolution Window'}
+                                        <p className={`text-[9px] font-black uppercase tracking-[0.2em] mb-1 ${complaint.is_escalated ? 'text-rose-500' : 'text-slate-400'}`}>
+                                          {complaint.is_escalated ? 'SLA Critical Threshold Breached' : 'Active Mission Window'}
                                         </p>
-                                        <p className={`text-sm font-black ${complaint.is_escalated ? 'text-rose-700' : 'text-white'}`}>
-                                          {new Date(complaint.deadline).toLocaleString()}
+                                        <p className={`text-lg font-black tracking-tight ${complaint.is_escalated ? 'text-rose-950' : 'text-white'}`}>
+                                          {new Date(complaint.deadline).toLocaleTimeString()}
                                         </p>
                                       </div>
                                     </div>
                                     {complaint.is_escalated && (
-                                      <div className="bg-rose-600 text-white px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg shadow-rose-200">
-                                        Priority Alert
+                                      <div className="bg-rose-600 text-white px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-rose-200 relative z-10 animate-pulse">
+                                        Priority Alpha
                                       </div>
                                     )}
+                                    <div className="absolute right-0 bottom-0 w-32 h-32 bg-white/5 rounded-full blur-[60px] -mr-16 -mb-16"></div>
                                   </motion.div>
                                 )}
                               </AnimatePresence>
