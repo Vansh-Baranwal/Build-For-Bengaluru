@@ -55,9 +55,15 @@ const GovernmentDashboard = () => {
             priority: 'high',
             status: 'in_progress',
             department_group: 'BBMP',
-            created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
+            created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
             reporter_reputation: 85,
-            is_escalated: true
+            is_escalated: true,
+            contractor: {
+              name: 'Skyline Infra Projects',
+              id: 'CONT-782',
+              efficiency: 42,
+              last_audit: '2024-02-15'
+            }
           },
           {
             complaint_id: 'REC-BLR-002',
@@ -67,9 +73,15 @@ const GovernmentDashboard = () => {
             priority: 'medium',
             status: 'pending',
             department_group: 'Cleaning Work',
-            created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+            created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
             reporter_reputation: 72,
-            is_escalated: false
+            is_escalated: false,
+            contractor: {
+              name: 'EcoClean Solutions Unit',
+              id: 'CONT-441',
+              efficiency: 68,
+              last_audit: '2024-03-01'
+            }
           },
           {
             complaint_id: 'REC-BLR-003',
@@ -79,9 +91,15 @@ const GovernmentDashboard = () => {
             priority: 'high',
             status: 'in_progress',
             department_group: 'BBMP',
-            created_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), // 12h ago
+            created_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
             reporter_reputation: 94,
-            is_escalated: true
+            is_escalated: true,
+            contractor: {
+              name: 'Apex Roadways Ltd',
+              id: 'CONT-905',
+              efficiency: 35,
+              last_audit: '2024-01-20'
+            }
           }
         ];
 
@@ -373,6 +391,36 @@ const GovernmentDashboard = () => {
 
                               <h3 className="text-3xl font-black text-white tracking-tight uppercase">{complaint.category}</h3>
                               <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-4xl">{complaint.description}</p>
+                              
+                              {complaint.contractor && (
+                                <motion.div 
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  className="mt-4 p-5 bg-white/5 rounded-3xl border border-white/5 flex items-center justify-between group/contractor"
+                                >
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                                       <Users className="w-4 h-4 text-indigo-400" />
+                                    </div>
+                                    <div>
+                                      <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Assigned Contractor</p>
+                                      <p className="text-[10px] font-black uppercase text-white tracking-wider">{complaint.contractor.name} <span className="text-slate-600 ml-2">#{complaint.contractor.id}</span></p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">SLA Efficiency</p>
+                                    <div className="flex items-center gap-2">
+                                       <div className="w-20 h-1 bg-white/5 rounded-full overflow-hidden">
+                                          <div 
+                                            className={`h-full ${complaint.contractor.efficiency < 50 ? 'bg-rose-500' : 'bg-emerald-500'}`} 
+                                            style={{ width: `${complaint.contractor.efficiency}%` }}
+                                          ></div>
+                                       </div>
+                                       <span className={`text-[10px] font-black ${complaint.contractor.efficiency < 50 ? 'text-rose-400' : 'text-emerald-400'}`}>{complaint.contractor.efficiency}%</span>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              )}
                             </div>
 
                               <div className="pt-8 mt-8 border-t border-white/5 flex flex-wrap items-center justify-between gap-8">
