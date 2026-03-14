@@ -209,6 +209,67 @@ Backend → Render
 Database → Supabase  
 
 ---
+### Architecture
+
+
+Build-For-Bengaluru/
+│
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── env.js
+│   │   │
+│   │   ├── controllers/
+│   │   │   └── complaintController.js
+│   │   │
+│   │   ├── database/
+│   │   │   └── db.js
+│   │   │
+│   │   ├── middlewares/
+│   │   │   ├── validator.js
+│   │   │   ├── rateLimiter.js
+│   │   │   └── errorHandler.js
+│   │   │
+│   │   ├── routes/
+│   │   │   └── complaintRoutes.js
+│   │   │
+│   │   ├── services/
+│   │   │   └── aiService.js
+│   │   │
+│   │   ├── utils/
+│   │   │   └── geoUtils.js
+│   │   │
+│   │   └── server.js
+│   │
+│   ├── package.json
+│   └── .env
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── Layout.jsx
+│   │   │   ├── StatCard.jsx
+│   │   │   └── LoadingSpinner.jsx
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── ReportIssue.jsx
+│   │   │   ├── TrackComplaint.jsx
+│   │   │   ├── CityMap.jsx
+│   │   │   └── TrendingIssues.jsx
+│   │   │
+│   │   ├── services/
+│   │   │   └── api.js
+│   │   │
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
+│   ├── package.json
+│   └── vite.config.js
+│
+└── README.md
 
 # 🏗 System Architecture
 
