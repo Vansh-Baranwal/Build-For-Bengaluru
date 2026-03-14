@@ -70,18 +70,18 @@ export default function CityMap() {
 
   return (
     <div className="h-[calc(100vh-5rem)] p-4 md:p-10 bg-transparent relative overflow-hidden">
-      <div className="mesh-gradient"></div>
+      {/* Removed mesh-gradient for better map visibility */}
       
-      <div className="h-full relative glass-panel rounded-[3.5rem] overflow-hidden border-white/5 shadow-3xl bg-white/5 backdrop-blur-md">
+      <div className="h-full relative glass-panel rounded-[3.5rem] overflow-hidden border-white/10 shadow-3xl bg-slate-900/40 backdrop-blur-md">
         <MapContainer
           center={center}
           zoom={12}
-          className="h-full w-full grayscale contrast-[1.2] brightness-[0.6] invert-[1] hue-rotate-[180deg]"
+          className="h-full w-full"
           zoomControl={false}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
           {/* Complaint Markers with Clustering */}
@@ -139,7 +139,7 @@ export default function CityMap() {
         <motion.div 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="absolute top-10 right-10 glass-panel rounded-[2.5rem] p-8 z-[1000] min-w-[240px] bg-black/60 backdrop-blur-2xl border border-white/10"
+          className="absolute top-10 right-10 glass-panel rounded-[2.5rem] p-8 z-[1000] min-w-[240px] bg-slate-900/80 backdrop-blur-2xl border border-white/20"
         >
           <div className="flex items-center gap-3 mb-6">
              <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
@@ -154,7 +154,7 @@ export default function CityMap() {
               { name: 'Streetlight', color: '#eab308' },
             ].map((item) => (
               <div key={item.name} className="flex items-center justify-between">
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.name}</span>
+                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{item.name}</span>
                 <div
                   className="w-5 h-5 rounded-lg border-2 border-white/20 shadow-xl rotate-12"
                   style={{ backgroundColor: item.color }}
@@ -162,8 +162,8 @@ export default function CityMap() {
               </div>
             ))}
           </div>
-          <div className="mt-8 pt-6 border-t border-white/5">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+          <div className="mt-8 pt-6 border-t border-white/10">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
               Total Signals: <span className="text-indigo-400 ml-2">{complaints.length}</span>
             </p>
           </div>
@@ -175,7 +175,7 @@ export default function CityMap() {
           animate={{ opacity: 1, y: 0 }}
           className="absolute top-10 left-10 z-[1000]"
         >
-           <div className="glass-panel rounded-2xl px-6 py-3 border border-white/10 shadow-2xl flex items-center gap-4 bg-black/40 backdrop-blur-xl">
+           <div className="glass-panel rounded-2xl px-6 py-3 border border-white/20 shadow-2xl flex items-center gap-4 bg-slate-900/60 backdrop-blur-xl">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
               <span className="text-[10px] font-black text-white uppercase tracking-widest underline decoration-indigo-500 decoration-2 underline-offset-4">Bengaluru Live Feed</span>
            </div>
