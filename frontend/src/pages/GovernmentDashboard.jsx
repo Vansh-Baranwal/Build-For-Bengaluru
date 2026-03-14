@@ -80,7 +80,6 @@ const GovernmentDashboard = () => {
     try {
       await api.updateComplaintStatus(id, newStatus);
       toast.success(`Marked as ${newStatus.replace('_', ' ')}`);
-      // Update local state
       setComplaints(prev => prev.map(c => 
         c.complaint_id === id ? { ...c, status: newStatus } : c
       ));
@@ -97,46 +96,37 @@ const GovernmentDashboard = () => {
     return matchesDept && matchesFilter;
   });
 
+  // Calculate metrics for current department
+  const deptComplaints = complaints.filter(c => c.department_group === activeTab);
+  const urgentCount = deptComplaints.filter(c => c.issue_type === 'Emergency').length;
+  const pendingCount = deptComplaints.filter(c => c.status === 'pending').length;
+  const resolvedCount = deptComplaints.filter(c => c.status === 'resolved').length;
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <LoadingSpinner text="Accessing Government Portal..." />
+        <LoadingSpinner text="Accessing Official Monitoring System..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20">
-      {/* Premium Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3">
-                <div className="bg-indigo-600 p-2 rounded-lg shadow-lg shadow-indigo-200">
-                  <Building2 className="text-white w-6 h-6" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Unified Command Center</h1>
-                  <p className="text-sm text-gray-500 font-medium uppercase tracking-widest flex items-center gap-2">
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                    Live Civic Monitoring
-                  </p>
-                </div>
-              </div>
+    <div className="min-h-screen bg-slate-50 flex">
+      {/* Side Navigation - Standard Admin Portal Look */}
+      <aside className="w-72 bg-slate-900 text-white flex flex-col fixed h-full z-20 shadow-2xl">
+        <div className="p-8">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="bg-indigo-600 p-2.5 rounded-2xl">
+              <Building2 className="w-6 h-6 text-white" />
             </div>
-            
-            <button
-              onClick={fetchDashboardData}
-              className="group flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full font-bold transition-all hover:bg-indigo-100 active:scale-95"
-            >
-              <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
-              Sync Data
-            </button>
+            <div>
+              <h2 className="text-xl font-black tracking-tighter">NAMMAFIX</h2>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Gov Portal</p>
+            </div>
           </div>
-          
-          {/* Department Tabs */}
-          <div className="flex overflow-x-auto no-scrollbar gap-2 mt-8 pb-1">
+
+          <nav className="space-y-1.5">
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 ml-2">Departments</p>
             {DEPARTMENTS.map((dept) => {
               const Icon = dept.icon;
               const isActive = activeTab === dept.id;
@@ -145,138 +135,220 @@ const GovernmentDashboard = () => {
                   key={dept.id}
                   onClick={() => setActiveTab(dept.id)}
                   className={`
-                    flex items-center gap-2 px-5 py-3 rounded-t-xl font-bold whitespace-nowrap transition-all duration-300 border-b-2
+                    w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl font-bold transition-all
                     ${isActive 
-                      ? `bg-indigo-50 text-indigo-600 border-indigo-600` 
-                      : 'bg-transparent text-gray-500 border-transparent hover:text-gray-700 hover:bg-gray-50'
+                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/40' 
+                      : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                     }
                   `}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-indigo-600' : 'text-gray-400'}`} />
-                  {dept.id}
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                  <span className="text-sm">{dept.id}</span>
                 </button>
               );
             })}
+          </nav>
+        </div>
+
+        <div className="mt-auto p-8 border-t border-slate-800">
+          <div className="bg-slate-800/50 p-4 rounded-2xl">
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Logged in as</p>
+            <p className="text-sm font-bold text-white">Administrator</p>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">System Online</span>
+            </div>
           </div>
         </div>
-      </div>
+      </aside>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        {/* Sub-Filters */}
-        <div className="flex flex-wrap gap-2 mb-8 items-center bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-tighter px-3 mr-2">Quick Filter:</span>
-          {ISSUE_FILTERS.map((filter) => {
-            const Icon = filter.icon;
-            const isActive = activeFilter === filter.id;
-            return (
-              <button
-                key={filter.id}
-                onClick={() => setActiveFilter(filter.id)}
-                className={`
-                  flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all
-                  ${isActive 
-                    ? 'bg-gray-900 text-white shadow-lg shadow-gray-200' 
-                    : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
-                  }
-                `}
-              >
-                <Icon className="w-4 h-4" />
-                {filter.id}
-              </button>
-            );
-          })}
+      {/* Main Content Area */}
+      <main className="flex-1 ml-72 p-10">
+        <header className="flex items-center justify-between mb-10">
+          <div>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Departmental Oversight</h1>
+            <p className="text-slate-500 font-medium">Monitoring {activeTab} Operations & Civic Compliance</p>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button
+              onClick={fetchDashboardData}
+              className="p-3 bg-white text-slate-600 rounded-2xl shadow-sm border border-slate-200 hover:bg-slate-50 transition-all active:scale-95"
+              title="Refresh Data"
+            >
+              <RefreshCw className="w-5 h-5" />
+            </button>
+            <div className="h-10 w-px bg-slate-200 mx-2" />
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-sm font-black text-slate-900">John Admin</p>
+                <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Master Official</p>
+              </div>
+              <div className="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-700 font-black border-2 border-white shadow-sm font-sans">
+                JA
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Quick Metrics Bar */}
+        <div className="grid grid-cols-4 gap-6 mb-10">
+          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Issues</p>
+            <p className="text-3xl font-black text-slate-900">{deptComplaints.length}</p>
+          </div>
+          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
+            <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">Emergency</p>
+            <p className="text-3xl font-black text-rose-600">{urgentCount}</p>
+          </div>
+          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
+            <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1">Awaiting Action</p>
+            <p className="text-3xl font-black text-amber-600">{pendingCount}</p>
+          </div>
+          <div className="bg-emerald-600 p-6 rounded-[2rem] shadow-xl shadow-emerald-100 ring-4 ring-emerald-50">
+            <p className="text-[10px] font-black text-emerald-100 uppercase tracking-widest mb-1">Resolved Today</p>
+            <p className="text-3xl font-black text-white">{resolvedCount}</p>
+          </div>
         </div>
 
-        {/* Complaints Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredComplaints.length === 0 ? (
-            <div className="col-span-full py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400">
-              <Clock className="w-12 h-12 mb-4 opacity-20" />
-              <p className="text-lg font-medium">No {activeFilter === 'All' ? '' : activeFilter} issues in {activeTab}</p>
-              <p className="text-sm">Everything seems to be in order for now.</p>
+        {/* Filters and List */}
+        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+          <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white">
+            <div className="flex items-center gap-6">
+              <h2 className="text-lg font-black text-slate-900 tracking-tight">Records & Compliance</h2>
+              <div className="flex gap-1.5 p-1 bg-slate-50 rounded-2xl">
+                {ISSUE_FILTERS.map((filter) => {
+                  const isActive = activeFilter === filter.id;
+                  return (
+                    <button
+                      key={filter.id}
+                      onClick={() => setActiveFilter(filter.id)}
+                      className={`
+                        px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all
+                        ${isActive 
+                          ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200' 
+                          : 'text-slate-400 hover:text-slate-600'
+                        }
+                      `}
+                    >
+                      {filter.id}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          ) : (
-            filteredComplaints.map((complaint) => (
-              <div 
-                key={complaint.complaint_id}
-                className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-100 transition-all group"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex flex-col gap-1">
-                    <span className={`
-                      text-[10px] uppercase font-black tracking-widest px-2 py-1 rounded-md w-fit
-                      ${complaint.issue_type === 'Emergency' ? 'bg-rose-100 text-rose-600' : 
-                        complaint.issue_type === 'Recurring' ? 'bg-amber-100 text-amber-600' :
-                        complaint.issue_type === 'Trends' ? 'bg-indigo-100 text-indigo-600' :
-                        'bg-slate-100 text-slate-600'}
-                    `}>
-                      {complaint.issue_type}
-                    </span>
-                    <h3 className="text-lg font-bold text-gray-800 line-clamp-1 capitalize">{complaint.category}</h3>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className={`
-                      px-3 py-1 rounded-full text-xs font-black uppercase
-                      ${complaint.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 
-                        complaint.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 
-                        'bg-orange-100 text-orange-700'}
-                    `}>
-                      {complaint.status.replace('_', ' ')}
-                    </span>
-                    <div className="flex flex-col items-end">
-                      <span className="text-[8px] font-black text-gray-400 uppercase tracking-tighter mb-0.5">Reporter Trust</span>
-                      <StarRating score={complaint.reporter_reputation || 50} />
+
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              Showing {filteredComplaints.length} entries
+            </p>
+          </div>
+
+          <div className="p-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              {filteredComplaints.length === 0 ? (
+                <div className="col-span-full py-20 flex flex-col items-center justify-center text-slate-300">
+                  <Clock className="w-16 h-16 mb-4 opacity-50" />
+                  <p className="text-xl font-black uppercase tracking-widest">No Active Filings</p>
+                  <p className="text-sm font-bold">Clear of all {activeFilter !== 'All' ? activeFilter : 'category'} reports</p>
+                </div>
+              ) : (
+                filteredComplaints.map((complaint) => (
+                  <div 
+                    key={complaint.complaint_id}
+                    className="group bg-slate-50/50 hover:bg-white rounded-[2.5rem] p-8 border border-transparent hover:border-slate-200 transition-all hover:shadow-2xl hover:shadow-slate-200/50"
+                  >
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex gap-2">
+                          <span className={`
+                            text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl border
+                            ${complaint.issue_type === 'Emergency' ? 'bg-rose-50 text-rose-600 border-rose-100' : 
+                              complaint.issue_type === 'Recurring' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                              'bg-white text-slate-600 border-slate-200'}
+                          `}>
+                            {complaint.issue_type}
+                          </span>
+                          <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-400 shadow-sm">
+                            CASE #{complaint.complaint_id.slice(0, 6)}
+                          </span>
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 tracking-tight capitalize block">{complaint.category}</h3>
+                      </div>
+
+                      <div className="text-right">
+                        <span className={`
+                          px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest
+                          ${complaint.status === 'resolved' ? 'bg-emerald-100 text-emerald-700 shadow-sm shadow-emerald-50' : 
+                            complaint.status === 'in_progress' ? 'bg-indigo-100 text-indigo-700 shadow-sm shadow-indigo-50' : 
+                            'bg-amber-100 text-amber-700 shadow-sm shadow-amber-50'}
+                        `}>
+                          {complaint.status.replace('_', ' ')}
+                        </span>
+                        <div className="mt-3">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-1">Integrity Score</p>
+                          <StarRating score={complaint.reporter_reputation || 50} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-slate-600 font-medium leading-relaxed mb-8">
+                      {complaint.description}
+                    </p>
+
+                    {complaint.image_url && (
+                      <div className="relative h-64 mb-8 rounded-[2rem] overflow-hidden bg-slate-200 border-4 border-white shadow-inner group-hover:scale-[1.02] transition-transform duration-500">
+                        <img 
+                          src={complaint.image_url} 
+                          alt="Evidence File" 
+                          className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-900 flex items-center gap-2">
+                          <ExternalLink className="w-3 h-3" /> Photographic Evidence
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-slate-400">
+                        <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-100 shadow-sm">
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span className="text-[10px] font-black uppercase tracking-wider">{complaint.latitude?.toFixed(4)}, {complaint.longitude?.toFixed(4)}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span className="text-[10px] font-black uppercase tracking-wider">{new Date(complaint.created_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-3">
+                        {complaint.status === 'pending' && (
+                          <button
+                            onClick={() => handleStatusUpdate(complaint.complaint_id, 'in_progress')}
+                            disabled={updatingId === complaint.complaint_id}
+                            className="bg-indigo-600 hover:bg-slate-900 text-white px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-100 active:scale-95 disabled:opacity-50"
+                          >
+                            Assign Task
+                          </button>
+                        )}
+                        {complaint.status === 'in_progress' && (
+                          <button
+                            onClick={() => handleStatusUpdate(complaint.complaint_id, 'resolved')}
+                            disabled={updatingId === complaint.complaint_id}
+                            className="bg-emerald-600 hover:bg-slate-900 text-white px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-emerald-100 active:scale-95 disabled:opacity-50"
+                          >
+                            Mark Complete
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <p className="text-gray-600 text-sm mb-6 line-clamp-2">
-                  {complaint.description}
-                </p>
-
-                {complaint.image_url && (
-                  <div className="relative h-48 mb-6 rounded-2xl overflow-hidden bg-gray-100">
-                    <img 
-                      src={complaint.image_url} 
-                      alt="Evidence" 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-                  <div className="flex items-center gap-2 text-gray-400 text-xs font-bold uppercase">
-                    <MapPin className="w-3 h-3" />
-                    ID: {complaint.complaint_id.slice(0, 8)}...
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    {complaint.status === 'pending' && (
-                      <button
-                        onClick={() => handleStatusUpdate(complaint.complaint_id, 'in_progress')}
-                        disabled={updatingId === complaint.complaint_id}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-100"
-                      >
-                        Start Work
-                      </button>
-                    )}
-                    {complaint.status === 'in_progress' && (
-                      <button
-                        onClick={() => handleStatusUpdate(complaint.complaint_id, 'resolved')}
-                        disabled={updatingId === complaint.complaint_id}
-                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-100"
-                      >
-                        Mark Resolved
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+                ))
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
