@@ -366,18 +366,36 @@ const Dashboard = () => {
               <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] text-right">Top 5% Contributor</p>
             </div>
             
-            <div className="bg-white rounded-[3.5rem] p-12 text-slate-900 relative overflow-hidden group">
-               <div className="relative z-10">
-                  <h4 className="text-xs font-black uppercase tracking-widest mb-6 opacity-60">Critical Assignment</h4>
-                  <p className="text-2xl font-black mb-10 leading-[1.1] uppercase italic tracking-tighter">Validate infrastructure breach at <span className="text-indigo-600">Whitefield Sector 5</span></p>
-                  <button className="w-full bg-slate-900 text-white py-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl">
-                    Accept Protocol
-                  </button>
-               </div>
-               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform duration-1000">
-                 <Navigation className="w-32 h-32" />
-               </div>
-            </div>
+            {locating ? (
+              <div className="glass-card rounded-[3.5rem] p-12 text-center border-white/5 flex flex-col items-center justify-center">
+                <Navigation className="w-8 h-8 text-indigo-400 animate-spin mb-4" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Acquiring Location...</p>
+              </div>
+            ) : nearbyComplaints.length > 0 ? (
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Navigation className="w-4 h-4 text-indigo-400" />
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Proximal Activity</h4>
+                </div>
+                <AnimatePresence>
+                  {nearbyComplaints.map(complaint => (
+                    <ValidationWidget 
+                      key={complaint.complaint_id} 
+                      complaint={complaint} 
+                      onActionComplete={() => {
+                        setNearbyComplaints(prev => prev.filter(c => c.complaint_id !== complaint.complaint_id));
+                        setSummary(s => ({ ...s, reputation: Math.min(100, s.reputation + 5) }));
+                      }} 
+                    />
+                  ))}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="glass-card rounded-[3rem] p-10 text-center border-white/5 opacity-50">
+                <MapPin className="w-8 h-8 text-slate-600 mx-auto mb-4" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No Nearby Tasks</p>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>
