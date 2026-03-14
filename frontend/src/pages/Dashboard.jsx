@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
+import ValidationWidget from '../components/ValidationWidget';
 
 const Dashboard = () => {
   const [complaints, setComplaints] = useState([]);
@@ -32,6 +33,8 @@ const Dashboard = () => {
   });
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [nearbyComplaints, setNearbyComplaints] = useState([]);
+  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
     const fetchComplaints = async () => {
@@ -53,6 +56,33 @@ const Dashboard = () => {
     };
 
     fetchComplaints();
+    
+    // Auto-locate and fetch nearby tasks
+    const initLocationServices = async () => {
+      if (!navigator.geolocation) return;
+      
+      setLocating(true);
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const { latitude, longitude } = pos.coords;
+            await api.updateLocation(latitude, longitude);
+            const tasks = await api.getNearbyComplaints();
+            setNearbyComplaints(tasks || []);
+          } catch (err) {
+            console.error('Location sync failed', err);
+          } finally {
+            setLocating(false);
+          }
+        },
+        (err) => {
+          console.error('Geolocation error', err);
+          setLocating(false);
+        }
+      );
+    };
+
+    initLocationServices();
   }, []);
 
   const containerVariants = {
@@ -246,7 +276,7 @@ const Dashboard = () => {
         </motion.div>
 
         <div className="flex flex-col lg:flex-row gap-16">
-          <div className="flex-1">
+          <div className="flex-1 order-2 lg:order-1">
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center gap-4">
                 <div className="w-2 h-8 bg-indigo-500 rounded-full"></div>
