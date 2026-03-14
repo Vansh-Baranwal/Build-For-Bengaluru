@@ -2,13 +2,13 @@ const axios = require('axios');
 const logger = require('../config/logger');
 
 const GNEWS_API_URL = 'https://gnews.io/api/v4/search';
-const API_KEY = process.env.GNEWS_API_KEY;
-
 /**
  * Fetch civic infrastructure news for Bengaluru from GNews
  * @returns {Promise<Array>} Array of news articles
  */
 async function fetchCityNews() {
+  const API_KEY = process.env.GNEWS_API_KEY;
+
   if (!API_KEY) {
     logger.warn('GNEWS_API_KEY is not configured. News feature will be disabled.');
     return [];
