@@ -11,9 +11,13 @@ const emailService = {
     // In production, this would use Gmail, SendGrid, etc.
     service: 'gmail',
     auth: {
-      user: process.env.SMTP_USER || 'mock_user',
-      pass: process.env.SMTP_PASS || 'mock_pass'
-    }
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    },
+    // Add timeouts to prevent hanging on Render
+    connectionTimeout: 10000, 
+    greetingTimeout: 5000,
+    socketTimeout: 15000
   }),
 
   /**
@@ -65,23 +69,32 @@ const emailService = {
     };
 
     try {
-      // For actual production, we use the transporter
+      logger.info({ 
+        has_credentials: !!(process.env.SMTP_USER && process.env.SMTP_PASS),
+        smtp_user: process.env.SMTP_USER ? 'Present' : 'Missing'
+      }, 'Preparing to send escalation email');
+
       if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-        await this.transporter.sendMail(mailOptions);
+        const info = await this.transporter.sendMail(mailOptions);
         logger.info({ 
           to: higherAuthorityEmail, 
-          complaint_id: complaint.complaint_id 
+          complaint_id: complaint.complaint_id,
+          messageId: info.messageId
         }, '📧 Escalation Email Sent Successfully');
       } else {
-        // Fallback to simulation if credentials are missing
         logger.warn({ 
           to: higherAuthorityEmail, 
           complaint_id: complaint.complaint_id 
-        }, '📧 SMTP credentials missing - Simulation Successful (Check .env)');
+        }, '📧 SMTP credentials missing - Simulation Successful');
       }
       return true;
     } catch (error) {
-      logger.error({ error: error.message }, 'Failed to send escalation email');
+      logger.error({ 
+        error: error.message,
+        code: error.code,
+        command: error.command,
+        complaint_id: complaint.complaint_id
+      }, 'Failed to send escalation email');
       return false;
     }
   }

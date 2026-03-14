@@ -6,6 +6,7 @@ const db = require('./database/db');
 const authRoutes = require('./routes/authRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
 const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler');
 const escalationService = require('./services/escalationService');
 
@@ -49,10 +50,23 @@ app.get('/health', async (req, res) => {
   try {
     const dbStatus = await db.checkConnection();
     
+    // Quick SMTP check if credentials exist
+    let smtpStatus = 'not_configured';
+    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      try {
+        const emailService = require('./services/emailService');
+        await emailService.transporter.verify();
+        smtpStatus = 'connected';
+      } catch (e) {
+        smtpStatus = 'error: ' + e.message;
+      }
+    }
+
     if (dbStatus.connected) {
       res.status(200).json({
         status: 'ok',
         database: 'connected',
+        smtp: smtpStatus,
         postgis: dbStatus.postgis ? 'enabled' : 'disabled',
         timestamp: dbStatus.timestamp
       });
@@ -60,6 +74,7 @@ app.get('/health', async (req, res) => {
       res.status(503).json({
         status: 'error',
         database: 'disconnected',
+        smtp: smtpStatus,
         error: dbStatus.error
       });
     }
@@ -77,6 +92,7 @@ app.get('/health', async (req, res) => {
  */
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api', complaintRoutes);
 
 /**

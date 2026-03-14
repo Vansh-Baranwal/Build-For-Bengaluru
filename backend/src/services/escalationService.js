@@ -16,10 +16,19 @@ const escalationService = {
     
     // Check every minute for Hackathon Mode
     cron.schedule('* * * * *', async () => {
-      await this.checkEscalations();
+      const now = new Date().toISOString();
+      logger.info({ timestamp: now }, '⏰ Cron Heartbeat: Checking for escalations');
+      try {
+        await this.checkEscalations();
+      } catch (error) {
+        logger.error({ error: error.message }, '❌ Cron Escalation execution failed');
+      }
     });
     
-    logger.info('Escalation Service initialized (Hourly Schedule)');
+    // Run once on startup to catch up
+    this.checkEscalations().catch(err => logger.error({ err }, 'Initial escalation check failed'));
+    
+    logger.info('Escalation Service initialized (Heartbeat active)');
   },
 
   /**
