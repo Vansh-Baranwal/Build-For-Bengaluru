@@ -274,14 +274,7 @@ const Dashboard = () => {
                       variants={itemVariants}
                       className="group glass-card rounded-[3rem] p-10 transition-all duration-700 hover:border-white/20 relative overflow-hidden"
                     >
-                      <div className="flex flex-col md:flex-row gap-10 relative z-10">
-                        <div className="w-full md:w-64 h-48 rounded-[2.5rem] overflow-hidden shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-700">
-                          <img 
-                            src={complaint.image_url || 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&q=80&w=800'} 
-                            alt="Issue" 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                          />
-                        </div>
+                      <div className="flex flex-col gap-6 relative z-10 w-full">
 
                         <div className="flex-1">
                           <div className="flex flex-wrap items-center gap-3 mb-6">
