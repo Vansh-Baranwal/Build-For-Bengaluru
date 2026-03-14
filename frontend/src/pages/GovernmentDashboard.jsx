@@ -157,7 +157,7 @@ const GovernmentDashboard = () => {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto bg-transparent relative custom-scrollbar">
-        <div className="max-w-7xl mx-auto px-10 py-12">
+        <div className="w-full px-6 lg:px-10 py-12">
           {/* Header */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
