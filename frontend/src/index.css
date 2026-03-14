@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap');
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 @import "leaflet.markercluster/dist/MarkerCluster.css";
@@ -6,21 +6,29 @@
 
 @layer base {
   :root {
-    --primary: #4f46e5;
-    --primary-glow: rgba(79, 70, 229, 0.4);
-    --secondary: #7c3aed;
+    --primary: #6366f1;
+    --primary-glow: rgba(99, 102, 241, 0.3);
+    --secondary: #8b5cf6;
     --accent: #10b981;
-    --background: #f8fafc;
+    --background: #0b0d11;
+    --surface: #12151c;
+    --border: rgba(255, 255, 255, 0.08);
   }
 
   body {
-    @apply text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-900;
-    font-family: 'Outfit', sans-serif;
+    @apply text-slate-300 antialiased selection:bg-indigo-500/30 selection:text-white;
+    font-family: 'Inter', sans-serif;
     background-color: var(--background);
+    color: #94a3b8;
     overflow-x: hidden;
   }
 
-  /* Neo-SaaS Mesh Gradient Background */
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Syne', sans-serif;
+    @apply text-white;
+  }
+
+  /* Refined Professional Gradient */
   .mesh-gradient {
     position: fixed;
     top: 0;
@@ -28,68 +36,78 @@
     width: 100%;
     height: 100%;
     z-index: -1;
-    background: radial-gradient(circle at 0% 0%, #edf2ff 0%, transparent 50%),
-                radial-gradient(circle at 100% 0%, #f5f3ff 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, #ecfdf5 0%, transparent 50%),
-                radial-gradient(circle at 0% 100%, #f0f9ff 0%, transparent 50%);
+    background: 
+      radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.05) 0%, transparent 40%),
+      #0b0d11;
   }
 
   .mesh-blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(80px);
+    filter: blur(120px);
     z-index: -1;
-    opacity: 0.4;
-    animation: blob-float 20s infinite alternate;
+    opacity: 0.15;
+    animation: blob-float 30s infinite alternate linear;
   }
 
-  .blob-1 { width: 600px; height: 600px; background: #e0e7ff; top: -10%; left: -10%; }
-  .blob-2 { width: 500px; height: 500px; background: #ede9fe; bottom: -10%; right: -10%; animation-delay: -5s; }
-  .blob-3 { width: 400px; height: 400px; background: #dcfce7; top: 40%; left: 40%; animation-delay: -10s; }
+  .blob-1 { width: 800px; height: 800px; background: #4f46e5; top: -20%; left: -10%; }
+  .blob-2 { width: 700px; height: 700px; background: #7c3aed; bottom: -20%; right: -10%; animation-delay: -10s; }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/60 backdrop-blur-2xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+    @apply bg-slate-900/40 backdrop-blur-2xl border border-white/5 shadow-2xl;
   }
 
   .glass-panel {
-    @apply bg-white/80 backdrop-blur-xl border border-white/50 shadow-2xl;
+    @apply bg-slate-900/60 backdrop-blur-3xl border border-white/10 shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)];
   }
 
   .stat-card {
-    @apply glass-card rounded-[2.5rem] p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(79,70,229,0.15)] hover:border-indigo-100/50;
+    @apply glass-card rounded-[2rem] p-8 transition-all duration-500 hover:-translate-y-2 hover:border-indigo-500/30 hover:bg-slate-900/60;
   }
   
   .btn-premium {
-    @apply relative overflow-hidden bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold transition-all duration-500 active:scale-95 hover:shadow-2xl hover:shadow-indigo-200/50 hover:bg-slate-800;
+    @apply relative overflow-hidden bg-white text-slate-900 px-8 py-4 rounded-xl font-bold transition-all duration-300 active:scale-95 hover:bg-slate-100 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)];
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] animate-shimmer-text;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400;
   }
 
   .nav-floating {
-    @apply fixed top-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-7xl z-[100] glass-card rounded-2xl px-6 py-3 flex items-center justify-between transition-all duration-300;
+    @apply fixed top-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-7xl z-[100] glass-card rounded-2xl px-6 py-3 flex items-center justify-between border-white/10;
+  }
+  
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
   }
 }
 
 @keyframes blob-float {
   0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, 50px) scale(1.05); }
+  100% { transform: translate(-20px, -20px) scale(1); }
 }
 
 @keyframes shimmer-text {
   to { background-position: 200% center; }
 }
 
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
 }
-
-.animate-float { animation: float 6s ease-in-out infinite; }
-.animate-shimmer-text { animation: shimmer-text 4s linear infinite; }
 

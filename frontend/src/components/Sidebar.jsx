@@ -77,11 +77,11 @@ export default function Sidebar({ isOpen, onClose }) {
                     <div className={`
                       flex items-center px-6 py-4 rounded-2xl transition-all duration-300
                       ${active
-                        ? 'bg-slate-900 text-white shadow-xl shadow-slate-200'
-                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                        ? 'bg-white/10 text-white border border-white/5'
+                        : 'text-slate-500 hover:bg-white/5 hover:text-white'
                       }
                     `}>
-                      <Icon className={`w-5 h-5 ${active ? 'text-indigo-400' : 'group-hover:text-indigo-500 transition-colors'}`} />
+                      <Icon className={`w-5 h-5 ${active ? 'text-indigo-400' : 'text-slate-500 group-hover:text-indigo-400 transition-colors'}`} />
                       <span className="ml-4 text-xs font-black uppercase tracking-widest">{item.label}</span>
                       
                       {active && (
@@ -96,11 +96,11 @@ export default function Sidebar({ isOpen, onClose }) {
               })}
             </nav>
 
-            <div className="pt-6 border-t border-slate-100">
-              <div className="glass-card rounded-2xl p-4 bg-indigo-50/50 border-indigo-100/50">
-                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600 mb-1">System Health</p>
-                <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
-                  <div className="bg-indigo-500 h-full w-[94%]"></div>
+            <div className="pt-6 border-t border-white/5">
+              <div className="glass-card rounded-2xl p-4 bg-white/5 border-white/5">
+                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-1">System Health</p>
+                <div className="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+                  <div className="bg-indigo-500 h-full w-[94%] shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
                 </div>
               </div>
             </div>
