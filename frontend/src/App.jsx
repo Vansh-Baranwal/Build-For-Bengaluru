@@ -22,7 +22,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen flex flex-col">
           <Routes>
             {/* Authentication Routes - No Sidebar/Navbar */}
             <Route path="/login/citizen" element={<CitizenLogin />} />
