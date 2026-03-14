@@ -5,107 +5,108 @@ import {
   Search, 
   Map, 
   TrendingUp,
-  X 
+  X,
+  Sparkles,
+  Zap
 } from 'lucide-react';
-
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
   const { user } = useAuth();
 
-  // Define navigation items based on role
   let navItems = [];
-
   if (!user || user.role === 'citizen') {
     navItems = [
-      { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-      { path: '/report', icon: FileText, label: 'Report Issue' },
-      { path: '/track', icon: Search, label: 'Track Complaint' },
-      { path: '/map', icon: Map, label: 'City Map' },
-      { path: '/trending', icon: TrendingUp, label: 'Trending Issues' },
+      { path: '/', icon: LayoutDashboard, label: 'Overview' },
+      { path: '/report', icon: Zap, label: 'Report Issue' },
+      { path: '/track', icon: Search, label: 'Intelligence' },
+      { path: '/trending', icon: TrendingUp, label: 'Analytics' },
     ];
   } else if (user.role === 'government') {
     navItems = [
-      { path: '/government', icon: LayoutDashboard, label: 'City Overview' },
-      { path: '/government/complaints', icon: FileText, label: 'Complaint Management' },
-      { path: '/map', icon: Map, label: 'City Map' },
-      { path: '/trending', icon: TrendingUp, label: 'Trending Issues' },
-    ];
-  } else if (user.role === 'news') {
-    navItems = [
-      { path: '/news', icon: TrendingUp, label: 'City Trends' },
-      { path: '/news/analytics', icon: FileText, label: 'Issue Analytics' },
-      { path: '/map', icon: Map, label: 'City Map' },
+      { path: '/government', icon: LayoutDashboard, label: 'Command Center' },
+      { path: '/government/complaints', icon: FileText, label: 'Operations' },
+      { path: '/trending', icon: TrendingUp, label: 'City Trends' },
     ];
   }
 
   const isActive = (path) => location.pathname === path;
 
   return (
-    <>
-      {/* Mobile overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={onClose}
-        />
+    <AnimatePresence>
+      {(isOpen || window.innerWidth >= 1024) && (
+        <motion.aside
+          initial={{ x: -300, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -300, opacity: 0 }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className={`
+            fixed lg:sticky top-32 left-0 z-50
+            w-72 h-[calc(100vh-10rem)] glass-panel rounded-[2.5rem] p-6 lg:block
+            ${isOpen ? 'block' : 'hidden'}
+          `}
+        >
+          <div className="h-full flex flex-col">
+            <div className="lg:hidden flex justify-end mb-4">
+              <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-900 transition-colors">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="px-4 mb-8">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="w-3 h-3 text-indigo-500" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Navigation Matrix</span>
+              </div>
+            </div>
+
+            <nav className="flex-1 space-y-2">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
+                
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={onClose}
+                    className="relative group block"
+                  >
+                    <div className={`
+                      flex items-center px-6 py-4 rounded-2xl transition-all duration-300
+                      ${active
+                        ? 'bg-slate-900 text-white shadow-xl shadow-slate-200'
+                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                      }
+                    `}>
+                      <Icon className={`w-5 h-5 ${active ? 'text-indigo-400' : 'group-hover:text-indigo-500 transition-colors'}`} />
+                      <span className="ml-4 text-xs font-black uppercase tracking-widest">{item.label}</span>
+                      
+                      {active && (
+                        <motion.div 
+                          layoutId="active-pill"
+                          className="absolute right-4 w-1 h-4 bg-indigo-500 rounded-full"
+                        />
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="pt-6 border-t border-slate-100">
+              <div className="glass-card rounded-2xl p-4 bg-indigo-50/50 border-indigo-100/50">
+                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600 mb-1">System Health</p>
+                <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+                  <div className="bg-indigo-500 h-full w-[94%]"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.aside>
       )}
-
-      {/* Sidebar */}
-      <aside
-        className={`
-          fixed lg:static inset-y-0 left-0 z-50
-          w-64 bg-white shadow-lg border-r border-gray-200
-          transform transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}
-      >
-        <div className="h-full flex flex-col">
-          {/* Mobile close button */}
-          <div className="lg:hidden flex justify-end p-4">
-            <button
-              onClick={onClose}
-              className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
-              
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={onClose}
-                  className={`
-                    flex items-center px-4 py-3 rounded-lg transition-all duration-200
-                    ${active
-                      ? 'bg-blue-50 text-blue-700 font-semibold shadow-sm'
-                      : 'text-gray-700 hover:bg-gray-100'
-                    }
-                  `}
-                >
-                  <Icon className={`w-5 h-5 ${active ? 'text-blue-600' : 'text-gray-500'}`} />
-                  <span className="ml-3">{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Footer */}
-          <div className="p-4 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center">
-              © 2026 NammaFix Platform
-            </p>
-          </div>
-        </div>
-      </aside>
-    </>
+    </AnimatePresence>
   );
 }

@@ -143,41 +143,41 @@ export default function ReportIssue() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-12 pb-20 px-6 font-sans">
+    <div className="min-h-screen pt-12 pb-20 px-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-16"
         >
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-4 h-4 text-indigo-600 animate-pulse" />
             <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Action Protocol</span>
           </div>
-          <h1 className="text-5xl font-black text-slate-900 tracking-tighter leading-none mb-4">
+          <h1 className="text-6xl font-black text-slate-900 tracking-tighter leading-none mb-6 uppercase">
             Report <span className="text-gradient">Incident</span>
           </h1>
-          <p className="text-slate-500 font-medium max-w-lg leading-relaxed uppercase tracking-tighter">
+          <p className="text-slate-500 font-medium max-w-lg uppercase text-xs tracking-tighter leading-relaxed">
             Contribute to the city's intelligence network by reporting infrastructure failures.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Main Form Area */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-2 space-y-8"
+            className="lg:col-span-2 space-y-10"
           >
-            <div className="glass-card rounded-[3rem] p-10 shadow-2xl shadow-indigo-100">
-              <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="glass-card rounded-[3.5rem] p-12 shadow-2xl shadow-indigo-100/20">
+              <form onSubmit={handleSubmit} className="space-y-10">
                 {/* Text & Voice */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Issue intelligence</label>
-                    <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full text-slate-500 text-[10px] font-bold">
-                      <Mic className="w-3 h-3" />
+                    <div className="flex items-center gap-2 px-3 py-1 bg-slate-900/5 rounded-full text-slate-500 text-[9px] font-black uppercase tracking-widest">
+                      <Mic className="w-3 h-3 text-indigo-600" />
                       Voice Enabled
                     </div>
                   </div>
@@ -186,10 +186,10 @@ export default function ReportIssue() {
                     value={formData.description}
                     onChange={handleChange}
                     placeholder="Describe the incident (e.g., Pothole near M.G. Road)..."
-                    className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-100 rounded-[2rem] px-8 py-6 text-sm font-medium outline-none transition-all placeholder:text-slate-400 min-h-[160px]"
+                    className="w-full bg-slate-50/50 border-2 border-transparent focus:border-indigo-100 rounded-[2.5rem] px-8 py-6 text-sm font-medium outline-none transition-all placeholder:text-slate-400 min-h-[180px]"
                     required={!audioBlob}
                   />
-                  <div className="bg-white/50 rounded-3xl p-4 border border-slate-100">
+                  <div className="bg-white/40 rounded-[2.5rem] p-6 border border-white/50">
                     <VoiceRecorder 
                         onRecordingComplete={setAudioBlob} 
                         onRemove={() => setAudioBlob(null)} 
@@ -198,21 +198,21 @@ export default function ReportIssue() {
                 </div>
 
                 {/* Map & Location */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Geospatial data</label>
                     <button
                       type="button"
                       onClick={handleGetLocation}
                       disabled={gettingLocation}
-                      className="text-indigo-600 text-[10px] font-black hover:underline flex items-center gap-1 uppercase tracking-widest"
+                      className="text-indigo-600 text-[10px] font-black hover:underline flex items-center gap-1 uppercase tracking-[0.2em]"
                     >
-                      <Navigation className={`w-3 h-3 ${gettingLocation ? 'animate-spin' : ''}`} />
+                      <Navigation className={`w-3.5 h-3.5 ${gettingLocation ? 'animate-spin' : ''}`} />
                       {gettingLocation ? 'Acquiring Signal...' : 'Auto-Locate'}
                     </button>
                   </div>
                   
-                  <div className="h-80 w-full rounded-[2.5rem] overflow-hidden border-4 border-white shadow-inner relative z-0">
+                  <div className="h-96 w-full rounded-[3rem] overflow-hidden border-[6px] border-white shadow-2xl relative z-0 group">
                     <MapContainer
                       center={[12.9716, 77.5946]}
                       zoom={12}
@@ -229,16 +229,19 @@ export default function ReportIssue() {
                       />
                       <MapUpdater position={position} />
                     </MapContainer>
+                    <div className="absolute top-6 left-6 z-[100] px-4 py-2 bg-slate-900/90 backdrop-blur-md rounded-xl text-[9px] font-black text-white uppercase tracking-widest border border-white/10">
+                      Live Coordinate Matrix
+                    </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                      <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Latitude</p>
-                      <p className="text-xs font-black text-slate-900">{formData.latitude || '0.000000'}</p>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="bg-white/60 backdrop-blur-md rounded-[2rem] p-6 border border-white shadow-sm">
+                      <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2">Latitude Vector</p>
+                      <p className="text-sm font-black text-slate-900 tracking-tight">{formData.latitude || '0.000000'}</p>
                     </div>
-                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                      <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Longitude</p>
-                      <p className="text-xs font-black text-slate-900">{formData.longitude || '0.000000'}</p>
+                    <div className="bg-white/60 backdrop-blur-md rounded-[2rem] p-6 border border-white shadow-sm">
+                      <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2">Longitude Vector</p>
+                      <p className="text-sm font-black text-slate-900 tracking-tight">{formData.longitude || '0.000000'}</p>
                     </div>
                   </div>
                 </div>
@@ -248,14 +251,14 @@ export default function ReportIssue() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className="w-full btn-premium py-6 flex items-center justify-center gap-4 text-sm font-black uppercase tracking-[0.2em]"
+                  className="w-full btn-premium py-8 flex items-center justify-center gap-6 text-sm font-black uppercase tracking-[0.3em]"
                 >
                   {loading ? (
-                    <LoadingSpinner size="sm" text="Submitting Protocol..." />
+                    <LoadingSpinner size="sm" text="Initializing Protocol..." />
                   ) : (
                     <>
                       <Send className="w-5 h-5" />
-                      Submit Incident Report
+                      Finalize & Broadcast
                     </>
                   )}
                 </motion.button>
@@ -267,82 +270,83 @@ export default function ReportIssue() {
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-8"
+            className="space-y-10"
           >
-            <div className="glass-card rounded-[3rem] p-10 text-center relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 via-indigo-400 to-emerald-400 animate-shimmer"></div>
+            <div className="glass-card rounded-[3.5rem] p-10 text-center relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 via-indigo-400 to-emerald-400 animate-shimmer"></div>
               
-              <div className="mb-6">
+              <div className="mb-8">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Visual Evidence</label>
               </div>
 
               <div className="relative">
                 {!previewUrl ? (
-                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-12 hover:border-indigo-400 hover:bg-white transition-all duration-500 cursor-pointer group relative overflow-hidden">
+                  <div className="bg-slate-50/50 border-4 border-dashed border-slate-200 rounded-[3rem] p-16 hover:border-indigo-400 hover:bg-white transition-all duration-700 cursor-pointer group relative overflow-hidden">
                     <input 
                       type="file" 
                       className="absolute inset-0 opacity-0 cursor-pointer z-10" 
                       accept="image/*" 
                       onChange={handleFileChange}
                     />
-                    <Upload className="w-12 h-12 text-slate-300 mx-auto mb-4 group-hover:text-indigo-400 transition-colors duration-500 animate-float" />
-                    <p className="text-[10px] font-bold text-slate-400 group-hover:text-slate-900 transition-colors uppercase tracking-widest leading-loose">
-                      Drop Evidence<br/> or <span className="text-indigo-600">Browse</span>
+                    <Upload className="w-16 h-16 text-slate-300 mx-auto mb-6 group-hover:text-indigo-400 transition-colors duration-700 animate-float" />
+                    <p className="text-[10px] font-black text-slate-400 group-hover:text-slate-900 transition-colors uppercase tracking-[0.2em] leading-relaxed">
+                      Transmit Lens<br/> or <span className="text-indigo-600">Scan</span>
                     </p>
                   </div>
                 ) : (
-                  <div className="relative group">
+                  <div className="relative group p-2 bg-white rounded-[3.5rem] shadow-2xl">
                     <motion.img 
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       src={previewUrl} 
                       alt="Evidence" 
-                      className="w-full aspect-square object-cover rounded-[2.5rem] shadow-2xl group-hover:scale-105 transition-transform duration-700"
+                      className="w-full aspect-[4/5] object-cover rounded-[3rem] shadow-inner group-hover:scale-105 transition-transform duration-1000"
                     />
                     <button
                       type="button"
                       onClick={() => { setSelectedFile(null); setPreviewUrl(null); }}
-                      className="absolute -top-3 -right-3 bg-rose-500 text-white p-3 rounded-2xl shadow-xl hover:bg-slate-900 transition-colors z-20"
+                      className="absolute -top-3 -right-3 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl hover:bg-rose-500 transition-all z-20"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-5 h-5" />
                     </button>
-                    <div className="absolute inset-x-0 -bottom-3 px-6 z-20">
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white">
-                        <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-900">AI Integrity Check Passed</p>
-                        </div>
-                    </div>
+                    <div className="absolute inset-x-0 -bottom-6 px-8 z-20">
+                      <div className="bg-slate-900/90 backdrop-blur-xl rounded-[1.5rem] p-5 shadow-2xl border border-white/10">
+                          <div className="flex items-center gap-3">
+                            <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(16,185,129,0.5)]"></div>
+                            <p className="text-[9px] font-black uppercase tracking-widest text-white/80">AI Optical Analysis: Online</p>
+                          </div>
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="mt-12 bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100">
+              <div className="mt-16 bg-indigo-50/30 rounded-[2rem] p-8 border border-indigo-100/50">
                 <div className="flex gap-4 items-start text-left">
-                  <div className="p-3 bg-white rounded-xl shadow-sm">
-                    <Sparkles className="w-4 h-4 text-indigo-600" />
+                  <div className="p-4 bg-white rounded-2xl shadow-sm">
+                    <Sparkles className="w-5 h-5 text-indigo-600" />
                   </div>
                   <div>
-                    <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-900 mb-1">Intelligent Priority</h5>
-                    <p className="text-[10px] font-medium text-slate-500 leading-relaxed uppercase tracking-tighter">AI automatically classifies severity based on image & description.</p>
+                    <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-900 mb-1">Neural Classification</h5>
+                    <p className="text-[9px] font-bold text-slate-500 leading-relaxed uppercase tracking-tighter">Automatic priority assignment through deep learning analysis of visual data.</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Hint Widget */}
-            <div className="bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden shadow-3xl">
+            {/* Protocol Tip Widget */}
+            <div className="bg-slate-900 rounded-[3.5rem] p-12 text-white relative overflow-hidden shadow-3xl">
               <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-white/10 rounded-2xl">
-                    <MapPin className="w-5 h-5 text-indigo-400" />
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="p-4 bg-white/10 rounded-2xl ring-1 ring-white/10">
+                    <Navigation className="w-6 h-6 text-indigo-400" />
                   </div>
-                  <h4 className="text-xs font-black uppercase tracking-widest">Protocol Tip</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Field Protocol</h4>
                 </div>
-                <p className="text-indigo-200 text-xs font-bold leading-relaxed">Ensure high-visibility photos for rapid departmental response.</p>
+                <p className="text-indigo-200 text-xs font-bold leading-relaxed mb-6 uppercase tracking-tighter">Ensure clear sightlines to landmarks for high-precision department response.</p>
+                <div className="h-1 w-12 bg-indigo-500 rounded-full"></div>
               </div>
-              <div className="absolute bottom-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl -mb-16 -mr-16"></div>
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-[100px] -mb-24 -mr-24"></div>
             </div>
           </motion.div>
         </div>

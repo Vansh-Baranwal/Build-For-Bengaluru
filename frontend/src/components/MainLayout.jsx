@@ -1,29 +1,27 @@
-import { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
-
-export default function MainLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const location = useLocation();
+const MainLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="min-h-screen relative">
+      {/* Neo-SaaS Mesh Gradient Background */}
+      <div className="mesh-gradient">
+        <div className="mesh-blob blob-1"></div>
+        <div className="mesh-blob blob-2"></div>
+        <div className="mesh-blob blob-3"></div>
+      </div>
+
+      <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
       
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex pt-32 px-6 pb-12 max-w-7xl mx-auto">
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         
-        <main className="flex-1 overflow-auto bg-transparent">
+        <main className="flex-1 lg:ml-8">
           <AnimatePresence mode="wait">
             <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="h-full"
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <Outlet />
             </motion.div>
@@ -32,5 +30,6 @@ export default function MainLayout() {
       </div>
     </div>
   );
-}
+};
 
+export default MainLayout;
