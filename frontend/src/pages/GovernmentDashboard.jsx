@@ -44,7 +44,48 @@ const GovernmentDashboard = () => {
       try {
         setLoading(true);
         const data = await api.getAllComplaints();
-        setComplaints(data || []);
+        
+        // High-quality mock data for recurring issues
+        const mockRecurring = [
+          {
+            complaint_id: 'REC-BLR-001',
+            category: 'Water Logging',
+            description: 'Chronic flooding at Richmond Road Underpass during heavy rains despite multiple patch works in the last 12 months.',
+            issue_type: 'Recurring',
+            priority: 'high',
+            status: 'in_progress',
+            department_group: 'BBMP',
+            created_at: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 days ago
+            reporter_reputation: 85,
+            is_escalated: true
+          },
+          {
+            complaint_id: 'REC-BLR-002',
+            category: 'Waste Management',
+            description: 'Persistent black spot and garbage pileup at Koramangala 5th Block. Cleared daily but resumes by nightfall. Needs automated surveillance.',
+            issue_type: 'Recurring',
+            priority: 'medium',
+            status: 'pending',
+            department_group: 'Cleaning Work',
+            created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+            reporter_reputation: 72,
+            is_escalated: false
+          },
+          {
+            complaint_id: 'REC-BLR-003',
+            category: 'Pothole Alert',
+            description: 'Repeated pothole formation at Bannerghatta Road Junction. Structural failure of base layer suspected due to heavy volume.',
+            issue_type: 'Recurring',
+            priority: 'high',
+            status: 'in_progress',
+            department_group: 'BBMP',
+            created_at: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), // 12h ago
+            reporter_reputation: 94,
+            is_escalated: true
+          }
+        ];
+
+        setComplaints([...mockRecurring, ...(data || [])]);
       } catch (error) {
         toast.error('Failed to load dashboard data');
       } finally {
