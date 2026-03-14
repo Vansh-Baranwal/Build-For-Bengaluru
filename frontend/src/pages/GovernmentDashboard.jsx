@@ -304,43 +304,35 @@ const GovernmentDashboard = () => {
                             complaint.is_escalated ? 'ring-4 ring-rose-500/20' : ''
                           }`}
                         >
-                          <div className="flex flex-col xl:flex-row gap-10">
-                            <div className="w-full xl:w-72 h-56 rounded-[2.5rem] overflow-hidden relative shadow-2xl">
-                              <img 
-                                src={complaint.image_url || 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&q=80&w=800'} 
-                                alt="Incident Evidence" 
-                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-transform duration-[1500ms] group-hover:scale-110"
-                              />
-                              <div className="absolute top-4 left-4 flex gap-2">
-                                <span className={`px-4 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest backdrop-blur-xl border border-white/10 ${
-                                  complaint.priority === 'high' || complaint.issue_type === 'Emergency'
-                                    ? 'bg-rose-500 text-white' 
-                                    : 'bg-slate-900/90 text-white shadow-xl'
-                                }`}>
-                                  {complaint.issue_type}
-                                </span>
-                              </div>
-                            </div>
+                          <div className="flex flex-col gap-6 w-full">
+                            <div className="flex flex-col gap-6">
+                              <div className="flex items-center justify-between flex-wrap gap-4">
+                                <div className="flex items-center gap-4">
+                                  <span className="text-[11px] font-black text-white uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-xl border border-white/5">Case ID: {complaint.complaint_id.slice(0, 8)}</span>
+                                  
+                                  <span className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 ${
+                                    complaint.priority === 'high' || complaint.issue_type === 'Emergency'
+                                      ? 'bg-rose-500/20 text-rose-400 border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.1)]' 
+                                      : 'bg-white/5 text-slate-400'
+                                  }`}>
+                                    {complaint.issue_type}
+                                  </span>
 
-                            <div className="flex-1 flex flex-col justify-between">
-                              <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-4">
-                                    <span className="text-[11px] font-black text-white uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-xl border border-white/5">Case ID: {complaint.complaint_id.slice(0, 8)}</span>
-                                    <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
-                                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Reporter Integrity</span>
-                                      <StarRating score={complaint.reporter_reputation || 50} />
-                                    </div>
-                                  </div>
-                                  <div className="text-right">
-                                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Entry Timestamp</p>
-                                    <p className="text-xs font-black text-white">{new Date(complaint.created_at).toLocaleString()}</p>
+                                  <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Reporter Integrity</span>
+                                    <StarRating score={complaint.reporter_reputation || 50} />
                                   </div>
                                 </div>
-
-                                <h3 className="text-3xl font-black text-white tracking-tight uppercase">{complaint.category}</h3>
-                                <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-2xl">{complaint.description}</p>
+                                <div className="text-right">
+                                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Entry Timestamp</p>
+                                  <p className="text-xs font-black text-white">{new Date(complaint.created_at).toLocaleString()}</p>
+                                </div>
                               </div>
+
+
+                              <h3 className="text-3xl font-black text-white tracking-tight uppercase">{complaint.category}</h3>
+                              <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-4xl">{complaint.description}</p>
+                            </div>
 
                               <div className="pt-8 mt-8 border-t border-white/5 flex flex-wrap items-center justify-between gap-8">
                                 <div className="flex items-center gap-8">
@@ -440,7 +432,6 @@ const GovernmentDashboard = () => {
                                 )}
                               </AnimatePresence>
                             </div>
-                          </div>
                         </motion.div>
                       ))
                     )}
