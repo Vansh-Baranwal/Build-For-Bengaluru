@@ -307,7 +307,7 @@ const GovernmentDashboard = () => {
                           <div className="flex flex-col xl:flex-row gap-10">
                             <div className="w-full xl:w-72 h-56 rounded-[2.5rem] overflow-hidden relative shadow-2xl">
                               <img 
-                                src={complaint.image_url || 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800'} 
+                                src={complaint.image_url || 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&q=80&w=800'} 
                                 alt="Incident Evidence" 
                                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-transform duration-[1500ms] group-hover:scale-110"
                               />

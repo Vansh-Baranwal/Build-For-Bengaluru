@@ -277,7 +277,7 @@ const Dashboard = () => {
                       <div className="flex flex-col md:flex-row gap-10 relative z-10">
                         <div className="w-full md:w-64 h-48 rounded-[2.5rem] overflow-hidden shadow-2xl grayscale group-hover:grayscale-0 transition-all duration-700">
                           <img 
-                            src={complaint.image_url || 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=800'} 
+                            src={complaint.image_url || 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&q=80&w=800'} 
                             alt="Issue" 
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                           />
