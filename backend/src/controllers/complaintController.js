@@ -369,11 +369,15 @@ async function getAllComplaints(req, res, next) {
         c.image_url,
         c.deadline,
         c.is_escalated,
+        c.feedback_rating,
+        c.feedback_comments,
         ST_Y(c.location::geometry) as latitude,
         ST_X(c.location::geometry) as longitude,
         c.created_at,
         c.updated_at,
-        u.reputation_score as reporter_reputation
+        u.reputation_score as reporter_reputation,
+        (SELECT COUNT(*) FROM complaint_verifications cv WHERE cv.complaint_id = c.complaint_id AND cv.is_genuine = true) as genuine_votes,
+        (SELECT COUNT(*) FROM complaint_verifications cv WHERE cv.complaint_id = c.complaint_id AND cv.is_genuine = false) as fake_votes
       FROM complaints c
       JOIN users u ON c.user_id = u.user_id
       ORDER BY c.created_at DESC

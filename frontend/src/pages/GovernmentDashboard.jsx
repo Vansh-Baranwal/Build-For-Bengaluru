@@ -12,7 +12,8 @@ import {
   Filter,
   BarChart3,
   Star,
-  Users
+  Users,
+  MessageSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../services/api';
@@ -381,6 +382,16 @@ const GovernmentDashboard = () => {
                                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Reporter Integrity</span>
                                     <StarRating score={complaint.reporter_reputation || 50} />
                                   </div>
+
+                                  {(complaint.genuine_votes > 0 || complaint.fake_votes > 0) && (
+                                    <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Community Consensus</span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-black text-emerald-400">+{complaint.genuine_votes} Genuine</span>
+                                        <span className="text-[10px] font-black text-rose-400">-{complaint.fake_votes} Fake</span>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="text-right">
                                   <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Entry Timestamp</p>
@@ -446,6 +457,35 @@ const GovernmentDashboard = () => {
                                   </div>
                                 </div>
 
+                                {complaint.status === 'resolved' && complaint.feedback_rating && (
+                                  <motion.div 
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="pt-6 mt-6 border-t border-white/5 flex flex-col gap-4 w-full"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                                          <MessageSquare className="w-3 h-3 text-emerald-400" />
+                                        </div>
+                                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Citizen Satisfaction Index</span>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        {[...Array(5)].map((_, i) => (
+                                          <div 
+                                            key={i} 
+                                            className={`w-1.5 h-1.5 rounded-full ${i < complaint.feedback_rating ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'bg-white/10'}`}
+                                          />
+                                        ))}
+                                      </div>
+                                    </div>
+                                    <div className="bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/10">
+                                      <p className="text-xs font-black text-white italic tracking-tight leading-relaxed">
+                                        "{complaint.feedback_comments || 'Case resolved successfully with no additional notes.'}"
+                                      </p>
+                                    </div>
+                                  </motion.div>
+                                )}
                                 <div className="flex gap-4">
                                   {complaint.status === 'pending' && (
                                     <div className="flex items-center gap-4">
