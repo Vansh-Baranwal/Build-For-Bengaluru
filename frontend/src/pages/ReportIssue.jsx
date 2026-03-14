@@ -165,6 +165,7 @@ export default function ReportIssue() {
                   </div>
                   <textarea
                     rows={4}
+                    name="description"
                     value={formData.description}
                     onChange={handleChange}
                     placeholder="Describe the incident (e.g., Pothole near M.G. Road)..."
