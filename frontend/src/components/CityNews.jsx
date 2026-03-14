@@ -9,10 +9,10 @@ const CityNews = ({ news }) => {
           <Newspaper className="w-8 h-8 text-slate-700" />
         </div>
         <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest leading-relaxed">
-          No active news feeds detected in the Bengaluru matrix.
+          Scanning Broadcast Matrix for Civic Intelligence...
         </h3>
-        <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em] mt-4">
-          GNEWS API key required for real-time intelligence sync.
+        <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em] mt-4 animate-pulse">
+          Syncing with City Infrastructure Feeds
         </p>
       </div>
     );

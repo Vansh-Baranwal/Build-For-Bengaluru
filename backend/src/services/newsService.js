@@ -14,11 +14,13 @@ async function fetchCityNews() {
     return [];
   }
 
+  logger.debug({ apiKeyMasked: API_KEY ? `${API_KEY.slice(0, 4)}...${API_KEY.slice(-4)}` : 'NONE' }, 'Using GNews API Key');
+
   try {
-    // Search query focusing on Bengaluru civic issues
-    const query = 'Bengaluru (potholes OR flooding OR garbage OR infrastructure OR traffic OR "civic issues")';
+    // Refined query focusing strictly on Bengaluru civic infrastructure and shortages
+    const query = 'Bengaluru AND ("civic issues" OR "infrastructure" OR "potholes" OR "flooding" OR "garbage" OR "LPG shortage" OR "water supply" OR "power cut" OR "waste management")';
     
-    logger.debug({ query }, 'Fetching city news from GNews');
+    logger.debug({ query }, 'Fetching focused Bengaluru news from GNews');
     
     const response = await axios.get(GNEWS_API_URL, {
       params: {

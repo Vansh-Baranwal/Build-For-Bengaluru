@@ -436,7 +436,9 @@ async function getMyComplaints(req, res, next) {
  */
 async function getCityNews(req, res, next) {
   try {
+    logger.debug('Fetching city news...');
     const news = await newsService.fetchCityNews();
+    logger.debug({ count: news.length }, 'Fetched city news articles');
     res.status(200).json(news);
   } catch (error) {
     logger.error({ error }, 'Error retrieving city news');
