@@ -82,6 +82,7 @@ Citizens can easily report and track civic problems.
 - Trending Issues
 
 ### Screenshots
+
 ![](screenshots/1.png)
 ![](screenshots/2.png)
 ![](screenshots/3.png)
