@@ -210,6 +210,8 @@ async function getComplaint(req, res, next) {
       category: complaint.category,
       priority: complaint.priority,
       status: complaint.status,
+      deadline: complaint.deadline,
+      is_escalated: complaint.is_escalated,
       latitude: complaint.latitude,
       longitude: complaint.longitude,
       created_at: complaint.created_at
@@ -246,15 +248,19 @@ async function updateComplaintStatus(req, res, next) {
     // 2. Update complaint status
     const query = `
       UPDATE complaints
-      SET status = $1
+      SET status = $1,
+          deadline = CASE WHEN $1 = 'in_progress' AND $3::timestamp IS NOT NULL THEN $3 ELSE deadline END,
+          is_escalated = CASE WHEN $1 = 'resolved' THEN FALSE ELSE is_escalated END
       WHERE complaint_id = $2
       RETURNING 
         complaint_id,
         status,
+        deadline,
+        is_escalated,
         updated_at
     `;
 
-    const result = await db.query(query, [status, id]);
+    const result = await db.query(query, [status, id, req.body.deadline || null]);
     const updatedComplaint = result.rows[0];
 
     // 3. Handle Reputation Updates
@@ -278,6 +284,8 @@ async function updateComplaintStatus(req, res, next) {
     res.status(200).json({
       complaint_id: updatedComplaint.complaint_id,
       status: updatedComplaint.status,
+      deadline: updatedComplaint.deadline,
+      is_escalated: updatedComplaint.is_escalated,
       updated_at: updatedComplaint.updated_at
     });
 
@@ -359,6 +367,8 @@ async function getAllComplaints(req, res, next) {
         c.department_group,
         c.issue_type,
         c.image_url,
+        c.deadline,
+        c.is_escalated,
         ST_Y(c.location::geometry) as latitude,
         ST_X(c.location::geometry) as longitude,
         c.created_at,
@@ -396,7 +406,9 @@ async function getMyComplaints(req, res, next) {
         status,
         department_group,
         issue_type,
-        image_url,
+        c.image_url,
+        c.deadline,
+        c.is_escalated,
         ST_Y(location::geometry) as latitude,
         ST_X(location::geometry) as longitude,
         created_at,

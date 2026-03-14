@@ -1,4 +1,5 @@
-import { AlertCircle, Droplets, Trash2, AlertTriangle, Star, Trophy, Newspaper, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { AlertCircle, Droplets, Trash2, AlertTriangle, Star, Trophy, Newspaper, MapPin, Clock } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import AlertBanner from '../components/AlertBanner';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -177,6 +178,9 @@ export default function Dashboard() {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Expected Completion
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date Submitted
                 </th>
               </tr>
@@ -205,6 +209,21 @@ export default function Dashboard() {
                       }`}>
                         {complaint.status.replace('_', ' ')}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {complaint.deadline ? (
+                        <div className="flex flex-col">
+                          <span className={`flex items-center gap-1.5 font-bold ${complaint.is_escalated ? 'text-rose-600' : 'text-gray-600'}`}>
+                            <Clock className={`w-3 h-3 ${complaint.is_escalated ? 'animate-pulse' : ''}`} />
+                            {new Date(complaint.deadline).toLocaleDateString()}
+                          </span>
+                          {complaint.is_escalated && (
+                            <span className="text-[10px] text-rose-500 font-black uppercase tracking-widest mt-0.5">Escalated to Authority</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 italic">Calculating SLA...</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(complaint.created_at)}

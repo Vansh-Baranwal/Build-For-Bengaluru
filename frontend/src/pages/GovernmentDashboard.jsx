@@ -75,13 +75,13 @@ const GovernmentDashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const handleStatusUpdate = async (id, newStatus) => {
+  const handleStatusUpdate = async (id, newStatus, deadline = null) => {
     setUpdatingId(id);
     try {
-      await api.updateComplaintStatus(id, newStatus);
+      await api.updateComplaintStatus(id, newStatus, deadline);
       toast.success(`Marked as ${newStatus.replace('_', ' ')}`);
       setComplaints(prev => prev.map(c => 
-        c.complaint_id === id ? { ...c, status: newStatus } : c
+        c.complaint_id === id ? { ...c, status: newStatus, deadline: deadline || c.deadline } : c
       ));
     } catch (error) {
       toast.error('Failed to update status');
@@ -323,13 +323,28 @@ const GovernmentDashboard = () => {
                       
                       <div className="flex gap-3">
                         {complaint.status === 'pending' && (
-                          <button
-                            onClick={() => handleStatusUpdate(complaint.complaint_id, 'in_progress')}
-                            disabled={updatingId === complaint.complaint_id}
-                            className="bg-indigo-600 hover:bg-slate-900 text-white px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-100 active:scale-95 disabled:opacity-50"
-                          >
-                            Assign Task
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <select 
+                              id={`deadline-${complaint.complaint_id}`}
+                              className="bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest px-3 py-3.5 rounded-2xl"
+                            >
+                              <option value="1">1 Minute</option>
+                              <option value="2">2 Minutes</option>
+                              <option value="5">5 Minutes</option>
+                            </select>
+                            <button
+                              onClick={() => {
+                                const mins = document.getElementById(`deadline-${complaint.complaint_id}`).value;
+                                const deadline = new Date();
+                                deadline.setMinutes(deadline.getMinutes() + parseInt(mins));
+                                handleStatusUpdate(complaint.complaint_id, 'in_progress', deadline.toISOString());
+                              }}
+                              disabled={updatingId === complaint.complaint_id}
+                              className="bg-indigo-600 hover:bg-slate-900 text-white px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-100 active:scale-95 disabled:opacity-50"
+                            >
+                              Assign Task
+                            </button>
+                          </div>
                         )}
                         {complaint.status === 'in_progress' && (
                           <button
@@ -342,6 +357,27 @@ const GovernmentDashboard = () => {
                         )}
                       </div>
                     </div>
+                    
+                    {complaint.deadline && complaint.status !== 'resolved' && (
+                      <div className={`mt-6 p-4 rounded-2xl flex items-center justify-between ${complaint.is_escalated ? 'bg-rose-50 border border-rose-100' : 'bg-slate-800'}`}>
+                        <div className="flex items-center gap-3">
+                          <Clock className={`w-4 h-4 ${complaint.is_escalated ? 'text-rose-600 animate-pulse' : 'text-indigo-400'}`} />
+                          <div>
+                            <p className={`text-[9px] font-black uppercase tracking-widest ${complaint.is_escalated ? 'text-rose-500' : 'text-slate-400'}`}>
+                              {complaint.is_escalated ? 'SLA Breached - Escalated' : 'Target Completion'}
+                            </p>
+                            <p className={`text-sm font-bold ${complaint.is_escalated ? 'text-rose-700' : 'text-white'}`}>
+                              {new Date(complaint.deadline).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                        {complaint.is_escalated && (
+                          <div className="bg-rose-600 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">
+                            High Priority
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))
               )}
@@ -352,5 +388,6 @@ const GovernmentDashboard = () => {
     </div>
   );
 };
+
 
 export default GovernmentDashboard;

@@ -130,11 +130,11 @@ export const api = {
   },
 
   // Update complaint status (requires authentication - government only)
-  async updateComplaintStatus(id, status) {
+  async updateComplaintStatus(id, status, deadline = null) {
     const response = await fetch(`${API_BASE_URL}/complaints/${id}/status`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, deadline }),
     });
     
     return handleResponse(response);

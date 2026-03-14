@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
 const userRoutes = require('./routes/userRoutes');
 const { errorHandler, notFoundHandler } = require('./middlewares/errorHandler');
+const escalationService = require('./services/escalationService');
 
 const app = express();
 
@@ -104,6 +105,9 @@ async function startServer() {
     
     logger.info('Database connected successfully');
     logger.info(`PostGIS ${dbStatus.postgis ? 'enabled' : 'disabled'}`);
+    
+    // Initialize background services
+    escalationService.init();
     
     // Start HTTP server
     const PORT = config.server.port;
