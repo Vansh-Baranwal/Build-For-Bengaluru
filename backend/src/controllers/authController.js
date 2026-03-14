@@ -35,8 +35,8 @@ async function register(req, res, next) {
 
     // Insert user
     await db.query(
-      `INSERT INTO public.users (name, email, password_hash, role) 
-       VALUES ($1, $2, $3, $4)`,
+      `INSERT INTO public.users (name, email, password_hash, role, reputation_score) 
+       VALUES ($1, $2, $3, $4, 50)`,
       [name, email, password_hash, role]
     );
 
@@ -56,10 +56,11 @@ async function register(req, res, next) {
  */
 async function login(req, res, next) {
   try {
-    const { email, password } = req.body;
+    const { email, username, identifier, password } = req.body;
+    const userIdentifier = identifier || email || username;
 
     // Hardcoded Admin Login for Government Officials
-    if (email === 'admin' && password === 'admin123') {
+    if (userIdentifier === 'admin' && password === 'admin123') {
       logger.info('Hardcoded admin logged in');
       
       const adminToken = jwt.sign(
@@ -79,15 +80,16 @@ async function login(req, res, next) {
           user_id: '00000000-0000-0000-0000-000000000000',
           name: 'NammaFix Administrator',
           email: 'admin',
-          role: 'government'
+          role: 'government',
+          reputation_score: 100
         }
       });
     }
 
     // Find user by email
     const result = await db.query(
-      'SELECT user_id, name, email, password_hash, role FROM public.users WHERE email = $1',
-      [email]
+      'SELECT user_id, name, email, password_hash, role, reputation_score FROM public.users WHERE email = $1',
+      [userIdentifier]
     );
 
     if (result.rows.length === 0) {
@@ -128,7 +130,8 @@ async function login(req, res, next) {
         user_id: user.user_id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        reputation_score: user.reputation_score
       }
     });
   } catch (error) {
@@ -143,7 +146,7 @@ async function login(req, res, next) {
 async function getProfile(req, res, next) {
   try {
     const result = await db.query(
-      'SELECT user_id, name, email, role, created_at FROM public.users WHERE user_id = $1',
+      'SELECT user_id, name, email, role, reputation_score, created_at FROM public.users WHERE user_id = $1',
       [req.user.user_id]
     );
 

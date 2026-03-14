@@ -230,7 +230,20 @@ async function updateComplaintStatus(req, res, next) {
   const { status } = req.body;
 
   try {
-    // Update complaint status (updated_at will be automatically updated by trigger)
+    // 1. Get the user_id of the person who reported this issue
+    const complaintInfo = await db.query(
+      'SELECT user_id, status as old_status FROM complaints WHERE complaint_id = $1',
+      [id]
+    );
+
+    if (complaintInfo.rows.length === 0) {
+      return next(new NotFoundError(`Complaint with ID ${id} does not exist`));
+    }
+
+    const reporter_id = complaintInfo.rows[0].user_id;
+    const oldStatus = complaintInfo.rows[0].old_status;
+
+    // 2. Update complaint status
     const query = `
       UPDATE complaints
       SET status = $1
@@ -242,17 +255,30 @@ async function updateComplaintStatus(req, res, next) {
     `;
 
     const result = await db.query(query, [status, id]);
+    const updatedComplaint = result.rows[0];
 
-    if (result.rows.length === 0) {
-      return next(new NotFoundError(`Complaint with ID ${id} does not exist`));
+    // 3. Handle Reputation Updates
+    // Only update if status actually changed to a final state
+    if (oldStatus !== status) {
+      if (status === 'resolved') {
+        await db.query(
+          'UPDATE users SET reputation_score = reputation_score + 10 WHERE user_id = $1',
+          [reporter_id]
+        );
+        logger.info({ user_id: reporter_id, points: 10 }, 'Awarded points for resolved complaint');
+      } else if (status === 'rejected') {
+        await db.query(
+          'UPDATE users SET reputation_score = reputation_score - 20 WHERE user_id = $1',
+          [reporter_id]
+        );
+        logger.info({ user_id: reporter_id, points: -20 }, 'Deducted points for false/rejected complaint');
+      }
     }
 
-    const complaint = result.rows[0];
-
     res.status(200).json({
-      complaint_id: complaint.complaint_id,
-      status: complaint.status,
-      updated_at: complaint.updated_at
+      complaint_id: updatedComplaint.complaint_id,
+      status: updatedComplaint.status,
+      updated_at: updatedComplaint.updated_at
     });
 
   } catch (error) {
@@ -325,20 +351,22 @@ async function getAllComplaints(req, res, next) {
   try {
     const query = `
       SELECT 
-        complaint_id,
-        description,
-        category,
-        priority,
-        status,
-        department_group,
-        issue_type,
-        image_url,
-        ST_Y(location::geometry) as latitude,
-        ST_X(location::geometry) as longitude,
-        created_at,
-        updated_at
-      FROM complaints
-      ORDER BY created_at DESC
+        c.complaint_id,
+        c.description,
+        c.category,
+        c.priority,
+        c.status,
+        c.department_group,
+        c.issue_type,
+        c.image_url,
+        ST_Y(c.location::geometry) as latitude,
+        ST_X(c.location::geometry) as longitude,
+        c.created_at,
+        c.updated_at,
+        u.reputation_score as reporter_reputation
+      FROM complaints c
+      JOIN users u ON c.user_id = u.user_id
+      ORDER BY c.created_at DESC
     `;
 
     const result = await db.query(query);
@@ -482,11 +510,24 @@ async function verifyComplaint(req, res, next) {
       const falseCount = parseInt(voteResult.rows[0].false_count);
       
       if (falseCount >= 3) {
-        await db.query(
-          "UPDATE complaints SET status = 'rejected' WHERE complaint_id = $1",
-          [id]
-        );
-        logger.info({ complaint_id: id, falseCount }, 'Complaint automatically rejected by community');
+        // Find reporter
+        const reporterResult = await db.query('SELECT user_id FROM complaints WHERE complaint_id = $1', [id]);
+        
+        if (reporterResult.rows.length > 0) {
+          const reporter_id = reporterResult.rows[0].user_id;
+          
+          await db.query(
+            "UPDATE complaints SET status = 'rejected' WHERE complaint_id = $1",
+            [id]
+          );
+
+          await db.query(
+            "UPDATE users SET reputation_score = reputation_score - 20 WHERE user_id = $1",
+            [reporter_id]
+          );
+
+          logger.info({ complaint_id: id, reporter_id, falseCount }, 'Complaint automatically rejected by community and reputation deducted');
+        }
       }
     }
 

@@ -1,15 +1,29 @@
-import { useEffect, useState } from 'react';
-import { AlertCircle, Droplets, Trash2, AlertTriangle } from 'lucide-react';
+import { AlertCircle, Droplets, Trash2, AlertTriangle, Star, Trophy, Newspaper, MapPin } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import AlertBanner from '../components/AlertBanner';
 import LoadingSpinner from '../components/LoadingSpinner';
 import CityNews from '../components/CityNews';
 import ValidationWidget from '../components/ValidationWidget';
 import { api } from '../services/api';
-import { Newspaper, MapPin } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
+const StarRating = ({ score }) => {
+  const rating = Math.min(5, Math.max(1, Math.ceil(score / 20)));
+  return (
+    <div className="flex gap-1">
+      {[...Array(5)].map((_, i) => (
+        <Star 
+          key={i} 
+          className={`w-4 h-4 ${i < rating ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`} 
+        />
+      ))}
+    </div>
+  );
+};
+
 export default function Dashboard() {
+  const { user } = useAuth();
   const [complaints, setComplaints] = useState([]);
   const [nearbyComplaints, setNearbyComplaints] = useState([]);
   const [news, setNews] = useState([]);
@@ -86,9 +100,25 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Personal Dashboard</h1>
-        <p className="text-gray-600 mt-1">Track your civic complaints and reports</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Personal Dashboard</h1>
+          <p className="text-gray-600 mt-1">Track your civic complaints and reports</p>
+        </div>
+        
+        {/* Reputation Badge */}
+        <div className="bg-white px-6 py-4 rounded-3xl shadow-lg border-2 border-amber-50 flex items-center gap-4">
+          <div className="bg-amber-100 p-3 rounded-2xl">
+            <Trophy className="w-6 h-6 text-amber-600" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">Citizen Reputation</span>
+              <StarRating score={user?.reputation_score || 50} />
+            </div>
+            <p className="text-2xl font-black text-slate-800">{user?.reputation_score || 50} <span className="text-xs font-bold text-gray-400 uppercase tracking-normal">Points</span></p>
+          </div>
+        </div>
       </div>
 
       {/* Community Validation Section */}

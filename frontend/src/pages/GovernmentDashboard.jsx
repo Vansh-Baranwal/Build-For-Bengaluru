@@ -15,8 +15,26 @@ import {
   TrendingUp,
   MapPin,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
+  Star
 } from 'lucide-react';
+
+const StarRating = ({ score }) => {
+  // Map score (default 50) to 1-5 stars
+  // <= 20: 1, 21-40: 2, 41-60: 3, 61-80: 4, 81+: 5
+  const rating = Math.min(5, Math.max(1, Math.ceil(score / 20)));
+  
+  return (
+    <div className="flex gap-0.5" title={`Reputation Score: ${score}`}>
+      {[...Array(5)].map((_, i) => (
+        <Star 
+          key={i} 
+          className={`w-3 h-3 ${i < rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`} 
+        />
+      ))}
+    </div>
+  );
+};
 
 const DEPARTMENTS = [
   { id: 'BBMP', icon: Building2, color: 'blue' },
@@ -196,14 +214,20 @@ const GovernmentDashboard = () => {
                     </span>
                     <h3 className="text-lg font-bold text-gray-800 line-clamp-1 capitalize">{complaint.category}</h3>
                   </div>
-                  <span className={`
-                    px-3 py-1 rounded-full text-xs font-black uppercase
-                    ${complaint.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 
-                      complaint.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 
-                      'bg-orange-100 text-orange-700'}
-                  `}>
-                    {complaint.status.replace('_', ' ')}
-                  </span>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className={`
+                      px-3 py-1 rounded-full text-xs font-black uppercase
+                      ${complaint.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 
+                        complaint.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 
+                        'bg-orange-100 text-orange-700'}
+                    `}>
+                      {complaint.status.replace('_', ' ')}
+                    </span>
+                    <div className="flex flex-col items-end">
+                      <span className="text-[8px] font-black text-gray-400 uppercase tracking-tighter mb-0.5">Reporter Trust</span>
+                      <StarRating score={complaint.reporter_reputation || 50} />
+                    </div>
+                  </div>
                 </div>
 
                 <p className="text-gray-600 text-sm mb-6 line-clamp-2">

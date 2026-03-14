@@ -40,9 +40,8 @@ router.post(
   [
     body('email')
       .trim()
-      .isEmail()
-      .normalizeEmail()
-      .withMessage('Valid email is required'),
+      .notEmpty()
+      .withMessage('Email or Username is required'),
     body('password')
       .notEmpty()
       .withMessage('Password is required')
