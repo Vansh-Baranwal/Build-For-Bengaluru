@@ -22,12 +22,14 @@ export default function Sidebar({ isOpen, onClose }) {
       { path: '/', icon: LayoutDashboard, label: 'Overview' },
       { path: '/report', icon: Zap, label: 'Report Issue' },
       { path: '/track', icon: Search, label: 'Intelligence' },
+      { path: '/map', icon: Map, label: 'City Map' },
       { path: '/trending', icon: TrendingUp, label: 'Analytics' },
     ];
   } else if (user.role === 'government') {
     navItems = [
       { path: '/government', icon: LayoutDashboard, label: 'Command Center' },
       { path: '/government/complaints', icon: FileText, label: 'Operations' },
+      { path: '/map', icon: Map, label: 'City Map' },
       { path: '/trending', icon: TrendingUp, label: 'City Trends' },
     ];
   }
