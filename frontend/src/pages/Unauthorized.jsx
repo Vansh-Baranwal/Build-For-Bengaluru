@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ShieldAlert } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Unauthorized = () => {
   const { user } = useAuth();
@@ -17,34 +18,46 @@ const Unauthorized = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full text-center space-y-8">
-        <div>
+    <div className="min-h-screen flex items-center justify-center p-6 bg-transparent relative">
+      <div className="mesh-gradient"></div>
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="glass-card max-w-md w-full text-center p-12 rounded-[3.5rem] relative overflow-hidden"
+      >
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-transparent"></div>
+        
+        <div className="space-y-8">
           <div className="flex justify-center">
-            <div className="bg-red-100 p-4 rounded-full">
-              <ShieldAlert className="h-16 w-16 text-red-600" />
+            <div className="bg-red-500/10 p-5 rounded-[2rem] border border-red-500/20">
+              <ShieldAlert className="h-12 w-12 text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.4)]" />
             </div>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Access Denied
-          </h2>
-          <p className="mt-4 text-lg text-gray-600">
-            You do not have permission to access this page
-          </p>
-          <p className="mt-2 text-sm text-gray-500">
-            This page is restricted to specific user roles. Please contact your administrator if you believe you should have access.
-          </p>
-        </div>
+          
+          <div>
+            <h2 className="mb-4">
+              Access <span className="text-red-500">Denied</span>
+            </h2>
+            <p className="text-slate-200 font-bold uppercase tracking-widest text-xs mb-4">
+              Node Authorization Failure
+            </p>
+            <p className="text-slate-500 text-sm font-medium leading-relaxed">
+              You do not have the required security clearing to access this restricted intelligence matrix. 
+              Please contact command if this is a system error.
+            </p>
+          </div>
 
-        <div className="mt-8">
-          <button
-            onClick={handleReturnToDashboard}
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Return to Dashboard
-          </button>
+          <div className="pt-4">
+            <button
+              onClick={handleReturnToDashboard}
+              className="btn-premium w-full group flex items-center justify-center gap-3"
+            >
+              Return to Base Core
+            </button>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

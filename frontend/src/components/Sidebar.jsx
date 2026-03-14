@@ -50,7 +50,7 @@ export default function Sidebar({ isOpen, onClose }) {
         >
           <div className="h-full flex flex-col">
             <div className="lg:hidden flex justify-end mb-4">
-              <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-900 transition-colors">
+              <button onClick={onClose} className="p-2 text-slate-400 hover:text-white transition-colors">
                 <X className="w-6 h-6" />
               </button>
             </div>

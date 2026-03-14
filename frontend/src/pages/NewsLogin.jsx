@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Newspaper } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const NewsLogin = () => {
   const { login } = useAuth();
@@ -80,112 +81,98 @@ const NewsLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-purple-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="flex justify-center">
-            <div className="bg-purple-600 p-4 rounded-full shadow-lg">
-              <Newspaper className="h-12 w-12 text-white" />
+    <div className="min-h-screen flex items-center justify-center p-6 bg-transparent relative overflow-hidden">
+      <div className="mesh-gradient"></div>
+      
+      <div className="max-w-md w-full relative">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center mb-10"
+        >
+          <div className="flex justify-center mb-6">
+            <div className="bg-purple-500/10 p-5 rounded-[2rem] border border-purple-500/20 flex items-center justify-center ring-8 ring-purple-500/5">
+              <Newspaper className="h-10 w-10 text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]" />
             </div>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-            News/Media Login
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Access civic data and analytics for reporting
+          <h1 className="mb-2 text-purple-400">Media Portal</h1>
+          <p className="text-slate-500 font-black uppercase tracking-[0.2em] text-[10px]">
+            Civic Intelligence Relay Station
           </p>
-        </div>
+        </motion.div>
 
-        <form className="mt-8 space-y-6 bg-white p-8 rounded-lg shadow-md" onSubmit={handleSubmit}>
-          {serverError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {serverError}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-panel p-10 relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-transparent"></div>
+          
+          <form className="space-y-8 relative z-10" onSubmit={handleSubmit}>
+            {serverError && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest leading-relaxed">
+                {serverError}
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {[
+                { id: 'email', label: 'Media Credentials', placeholder: 'reporter@news.com', type: 'email' },
+                { id: 'password', label: 'Security Key', placeholder: '••••••••', type: 'password' }
+              ].map((field) => (
+                <div key={field.id}>
+                  <label htmlFor={field.id} className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block tracking-[0.15em]">
+                    {field.label}
+                  </label>
+                  <input
+                    id={field.id}
+                    name={field.id}
+                    type={field.type}
+                    required
+                    value={formData[field.id]}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={`w-full px-6 py-4 bg-white/5 border ${
+                      errors[field.id] ? 'border-red-500/50' : 'border-white/5'
+                    } rounded-2xl text-white font-bold focus:bg-white/10 focus:ring-2 focus:ring-purple-500/50 transition-all outline-none placeholder:text-slate-600`}
+                    placeholder={field.placeholder}
+                  />
+                  {errors[field.id] && (
+                    <p className="mt-2 text-[10px] text-red-500 font-bold uppercase tracking-widest ml-1">{errors[field.id]}</p>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.email ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500`}
-                placeholder="reporter@news.com"
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-              )}
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="btn-premium w-full flex items-center justify-center gap-3 !text-purple-400 !border-purple-500/30 !bg-purple-500/10 hover:!bg-purple-500/20"
+              >
+                {isSubmitting ? 'Authenticating...' : 'Authorize Relay'}
+              </button>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={`mt-1 block w-full px-3 py-2 border ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
-                } rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500`}
-                placeholder="••••••••"
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Signing in...' : 'Sign in as News/Media'}
-            </button>
-          </div>
-
-          <div className="text-center space-y-2">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-purple-600 hover:text-purple-500">
-                Create account
-              </Link>
-            </p>
-            <div className="pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600 mb-2">Login as:</p>
-              <div className="flex gap-2 justify-center">
-                <Link
-                  to="/login/citizen"
-                  className="text-sm text-gray-600 hover:text-blue-600 underline"
-                >
-                  Citizen
+            <div className="text-center space-y-6">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                New bureau?{' '}
+                <Link to="/register" className="text-purple-400 hover:text-white transition-colors">
+                  Submit Credentials
                 </Link>
-                <span className="text-gray-400">|</span>
-                <Link
-                  to="/login/government"
-                  className="text-sm text-gray-600 hover:text-green-600 underline"
-                >
-                  Government
-                </Link>
+              </p>
+              
+              <div className="pt-6 border-t border-white/5 space-y-4">
+                <p className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">Connect to Network Nodes:</p>
+                <div className="flex gap-4 justify-center">
+                  <Link to="/login/citizen" className="text-[9px] font-black text-slate-500 hover:text-indigo-400 transition-colors uppercase tracking-widest">Citizen Sync</Link>
+                  <span className="text-slate-800 text-[9px]">|</span>
+                  <Link to="/login/government" className="text-[9px] font-black text-slate-500 hover:text-green-400 transition-colors uppercase tracking-widest">Official Proxy</Link>
+                </div>
               </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </motion.div>
       </div>
     </div>
   );

@@ -335,18 +335,18 @@ export default function ReportIssue() {
             </div>
 
             {/* Protocol Tip Widget */}
-            <div className="bg-white rounded-[3.5rem] p-12 text-slate-900 relative overflow-hidden shadow-3xl">
+            <div className="glass-panel rounded-[3.5rem] p-12 text-white relative overflow-hidden shadow-3xl bg-white/5 border border-white/5">
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="p-4 bg-slate-900 rounded-2xl ring-1 ring-slate-900/10">
-                    <Navigation className="w-6 h-6 text-white" />
+                  <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/20">
+                    <Navigation className="w-6 h-6 text-indigo-400" />
                   </div>
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Field Protocol</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Field Protocol</h4>
                 </div>
-                <p className="text-slate-600 text-xs font-black leading-relaxed mb-6 uppercase tracking-tighter">Ensure clear sightlines to landmarks for high-precision department response.</p>
-                <div className="h-1 w-12 bg-slate-900 rounded-full"></div>
+                <p className="text-slate-400 text-xs font-black leading-relaxed mb-6 uppercase tracking-tighter">Ensure clear sightlines to landmarks for high-precision department response.</p>
+                <div className="h-1 w-12 bg-indigo-500 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
               </div>
-              <div className="absolute bottom-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-[100px] -mb-24 -mr-24"></div>
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-[100px] -mb-24 -mr-24"></div>
             </div>
           </motion.div>
         </div>

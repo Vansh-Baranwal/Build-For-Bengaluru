@@ -197,7 +197,7 @@ const Dashboard = () => {
               <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Citizen Intelligence Matrix</span>
             </div>
-            <h1 className="text-6xl font-black text-white tracking-tighter leading-none mb-6 uppercase">
+            <h1 className="mb-6">
               Welcome Back, <span className="text-gradient">Citizen</span>
             </h1>
             <p className="text-slate-400 font-medium max-w-md uppercase text-xs tracking-tighter leading-relaxed">Monitoring and enhancing Bengaluru's infrastructure through collective intelligence.</p>
@@ -211,7 +211,7 @@ const Dashboard = () => {
             <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center group-hover:rotate-90 transition-transform duration-700">
               <PlusCircle className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-slate-900">New Operational Report</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em]">New Operational Report</span>
           </motion.button>
         </motion.div>
 

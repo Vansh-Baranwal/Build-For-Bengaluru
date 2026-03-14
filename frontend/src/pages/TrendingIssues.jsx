@@ -91,7 +91,7 @@ export default function TrendingIssues() {
                         <td className="px-10 py-8">
                           <div className={`
                             w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm shadow-xl
-                            ${index === 0 ? 'bg-white text-slate-900 scale-110 shadow-indigo-500/20' : 
+                            ${index === 0 ? 'bg-indigo-500 text-white scale-110 shadow-indigo-500/20' : 
                               index === 1 ? 'bg-white/10 text-white border border-white/5' : 
                               index === 2 ? 'bg-white/10 text-white border border-white/5' : 
                               'bg-white/5 text-slate-500 border border-white/5'}
@@ -171,9 +171,9 @@ export default function TrendingIssues() {
             <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
               Broadcast <span className="text-gradient">Matrix</span>
             </h2>
-            <div className="ml-auto px-4 py-2 bg-white rounded-2xl">
-                <span className="text-[9px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                   <div className="w-1 h-1 bg-red-600 rounded-full animate-pulse"></div> Live Bengaluru
+            <div className="ml-auto px-4 py-2 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md">
+                <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+                   <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div> Live Bengaluru
                 </span>
             </div>
           </motion.div>

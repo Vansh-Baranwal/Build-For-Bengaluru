@@ -172,7 +172,7 @@ const GovernmentDashboard = () => {
                 <div className="w-1.5 h-1.5 bg-slate-700 rounded-full"></div>
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Node: BLR-CENTRAL-01</span>
               </div>
-              <h1 className="text-6xl font-black text-white tracking-tighter leading-none mb-4 uppercase">
+              <h1 className="mb-4">
                 Unified <span className="text-gradient">Command</span>
               </h1>
               <p className="text-slate-500 text-xs font-black uppercase tracking-widest opacity-60">Bengaluru Civic Response & Intelligence Matrix</p>

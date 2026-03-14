@@ -68,12 +68,14 @@ export default function CityMap() {
   const center = [12.9716, 77.5946]; // Bengaluru
 
   return (
-    <div className="h-[calc(100vh-5rem)] p-4 md:p-10">
-      <div className="h-full relative glass-panel rounded-[3.5rem] overflow-hidden border-white/40 shadow-3xl bg-white/10 backdrop-blur-md">
+    <div className="h-[calc(100vh-5rem)] p-4 md:p-10 bg-transparent relative overflow-hidden">
+      <div className="mesh-gradient"></div>
+      
+      <div className="h-full relative glass-panel rounded-[3.5rem] overflow-hidden border-white/5 shadow-3xl bg-white/5 backdrop-blur-md">
         <MapContainer
           center={center}
           zoom={12}
-          className="h-full w-full grayscale-[0.2] contrast-[1.1]"
+          className="h-full w-full grayscale contrast-[1.2] brightness-[0.6] invert-[1] hue-rotate-[180deg]"
           zoomControl={false}
         >
           <TileLayer
@@ -94,17 +96,20 @@ export default function CityMap() {
                 icon={getMarkerIcon(complaint.category)}
               >
                 <Popup className="premium-popup">
-                  <div className="p-4 glass-card border-white/50 bg-white/80">
-                    <h3 className="font-black text-slate-900 uppercase text-xs tracking-tighter mb-4">
-                      {complaint.category}
+                  <div className="p-4 glass-panel border-white/20 bg-black/80 backdrop-blur-xl min-w-[180px]">
+                    <h3 className="font-black text-white uppercase text-[10px] tracking-[0.2em] mb-4 border-b border-white/10 pb-2">
+                       {complaint.category}
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div>
                         <PriorityBadge priority={complaint.priority} />
                       </div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-loose">
-                        COORDINATES: <br/> {complaint.latitude.toFixed(5)} / {complaint.longitude.toFixed(5)}
-                      </p>
+                      <div className="space-y-1">
+                        <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Digital Coordinates</p>
+                        <p className="text-[9px] font-black text-indigo-400 tracking-tighter">
+                          {complaint.latitude.toFixed(5)} / {complaint.longitude.toFixed(5)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </Popup>
@@ -120,20 +125,24 @@ export default function CityMap() {
               radius={200}
               pathOptions={{
                 fillColor: complaint.priority === 'high' ? '#ef4444' : complaint.priority === 'medium' ? '#f97316' : '#22c55e',
-                fillOpacity: 0.15,
+                fillOpacity: 0.2,
                 color: complaint.priority === 'high' ? '#ef4444' : complaint.priority === 'medium' ? '#f97316' : '#22c55e',
                 weight: 1,
-                opacity: 0.4,
+                opacity: 0.5,
               }}
             />
           ))}
         </MapContainer>
 
         {/* Legend */}
-        <div className="absolute top-10 right-10 glass-card rounded-[2.5rem] p-8 z-[1000] border-white/40 shadow-3xl min-w-[240px] bg-white/40 backdrop-blur-2xl">
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="absolute top-10 right-10 glass-panel rounded-[2.5rem] p-8 z-[1000] min-w-[240px] bg-black/60 backdrop-blur-2xl border border-white/10"
+        >
           <div className="flex items-center gap-3 mb-6">
-             <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
-             <h3 className="font-black text-slate-900 uppercase text-[10px] tracking-[0.2em]">Matrix Legend</h3>
+             <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
+             <h3 className="font-black text-white uppercase text-[10px] tracking-[0.2em]">Matrix Legend</h3>
           </div>
           <div className="space-y-4">
             {[
@@ -146,26 +155,30 @@ export default function CityMap() {
               <div key={item.name} className="flex items-center justify-between">
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{item.name}</span>
                 <div
-                  className="w-5 h-5 rounded-lg border-2 border-white shadow-xl rotate-12 group-hover:rotate-0 transition-transform"
+                  className="w-5 h-5 rounded-lg border-2 border-white/20 shadow-xl rotate-12"
                   style={{ backgroundColor: item.color }}
                 />
               </div>
             ))}
           </div>
-          <div className="mt-8 pt-6 border-t border-slate-900/5">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              Total Signals: <span className="text-slate-900 ml-2">{complaints.length}</span>
+          <div className="mt-8 pt-6 border-t border-white/5">
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              Total Signals: <span className="text-indigo-400 ml-2">{complaints.length}</span>
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Header Overlay */}
-        <div className="absolute top-10 left-10 z-[1000]">
-           <div className="glass-card rounded-2xl px-6 py-3 border-white/40 shadow-2xl flex items-center gap-4 bg-white/40 backdrop-blur-xl">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest underline decoration-indigo-500 decoration-2 underline-offset-4">Bengaluru Live Feed</span>
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute top-10 left-10 z-[1000]"
+        >
+           <div className="glass-panel rounded-2xl px-6 py-3 border border-white/10 shadow-2xl flex items-center gap-4 bg-black/40 backdrop-blur-xl">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+              <span className="text-[10px] font-black text-white uppercase tracking-widest underline decoration-indigo-500 decoration-2 underline-offset-4">Bengaluru Live Feed</span>
            </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

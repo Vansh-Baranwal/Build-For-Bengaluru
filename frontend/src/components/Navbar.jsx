@@ -60,7 +60,7 @@ export default function Navbar({ onMenuClick }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={logout}
-                className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-400 hover:bg-white hover:text-slate-900 transition-all"
+                className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-400 hover:bg-indigo-500/20 hover:text-indigo-400 transition-all border border-transparent hover:border-indigo-500/30"
               >
                 <LogOut className="w-4 h-4" />
               </motion.button>
@@ -76,7 +76,7 @@ export default function Navbar({ onMenuClick }) {
             </Link>
             <Link
               to="/register"
-              className="bg-white text-slate-900 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all"
+              className="btn-premium px-6 py-2.5 rounded-xl text-[10px]"
             >
               Start Contributing
             </Link>
