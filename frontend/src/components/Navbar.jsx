@@ -18,19 +18,16 @@ export default function Navbar({ onMenuClick }) {
         
         <Link to="/" className="flex items-center group">
           <motion.div 
-            whileHover={{ rotate: 180 }}
-            transition={{ duration: 0.6, ease: "circOut" }}
-            className="w-10 h-10 bg-white rounded-xl flex items-center justify-center relative overflow-hidden ring-4 ring-white/5"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3, ease: "circOut" }}
+            className="flex items-center"
           >
-            <Activity className="w-6 h-6 text-slate-900 relative z-10" />
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <img 
+              src="/src/assets/logo.png" 
+              alt="NammaFix Logo" 
+              className="h-12 w-auto drop-shadow-[0_0_15px_rgba(99,102,241,0.3)] group-hover:drop-shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all"
+            />
           </motion.div>
-          <div className="ml-3">
-            <h1 className="text-xl font-black text-white tracking-tighter leading-none flex items-center gap-1">
-              NammaFix <Sparkles className="w-3 h-3 text-indigo-400" />
-            </h1>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Intelligence Hub</p>
-          </div>
         </Link>
       </div>
 

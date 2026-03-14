@@ -56,9 +56,12 @@ const Register = () => {
           className="text-center mb-8"
         >
           <div className="flex justify-center mb-6">
-            <div className="bg-indigo-500/10 p-4 rounded-3xl border border-indigo-500/20 flex items-center justify-center ring-8 ring-indigo-500/5">
-              <UserPlus className="h-10 w-10 text-indigo-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]" />
-            </div>
+            <motion.img 
+              whileHover={{ scale: 1.05 }}
+              src="/src/assets/logo.png" 
+              alt="NammaFix Logo" 
+              className="h-24 w-auto drop-shadow-[0_0_20px_rgba(99,102,241,0.3)]"
+            />
           </div>
           <h1 className="mb-2">Join the Network</h1>
           <p className="text-slate-500 font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-2">

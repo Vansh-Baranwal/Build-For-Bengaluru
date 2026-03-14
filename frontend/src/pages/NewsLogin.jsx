@@ -91,9 +91,12 @@ const NewsLogin = () => {
           className="text-center mb-10"
         >
           <div className="flex justify-center mb-6">
-            <div className="bg-purple-500/10 p-5 rounded-[2rem] border border-purple-500/20 flex items-center justify-center ring-8 ring-purple-500/5">
-              <Newspaper className="h-10 w-10 text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]" />
-            </div>
+            <motion.img 
+              whileHover={{ scale: 1.05 }}
+              src="/src/assets/logo.png" 
+              alt="NammaFix Logo" 
+              className="h-24 w-auto drop-shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+            />
           </div>
           <h1 className="mb-2 text-purple-400">Media Portal</h1>
           <p className="text-slate-500 font-black uppercase tracking-[0.2em] text-[10px]">
