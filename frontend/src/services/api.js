@@ -211,4 +211,15 @@ export const api = {
     
     return handleResponse(response);
   },
+
+  // Submit feedback for a resolved complaint
+  async submitFeedback(id, rating, comments) {
+    const response = await fetch(`${API_BASE_URL}/complaints/${id}/feedback`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ rating, comments }),
+    });
+    
+    return handleResponse(response);
+  },
 };

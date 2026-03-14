@@ -13,7 +13,9 @@ import {
   Star,
   Map as MapIcon,
   Navigation,
-  Sparkles
+  Sparkles,
+  MessageSquare,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../services/api';
@@ -28,6 +30,8 @@ const Dashboard = () => {
     resolved: 0,
     reputation: 85 // Mock reputation
   });
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   useEffect(() => {
     const fetchComplaints = async () => {
@@ -62,6 +66,121 @@ const Dashboard = () => {
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
+  };
+
+  const handleFeedbackSubmit = async (id, rating, comments) => {
+    await api.submitFeedback(id, rating, comments);
+    // Update local state to show feedback is submitted
+    setComplaints(prev => prev.map(c => 
+      c.complaint_id === id ? { ...c, feedback_rating: rating, feedback_comments: comments } : c
+    ));
+    // Proactively update reputation as well if needed (though backend handles database side)
+    setSummary(prev => ({ ...prev, reputation: Math.min(100, prev.reputation + 2) }));
+  };
+
+  const FeedbackModal = ({ complaint, onClose, onSubmit }) => {
+    const [rating, setRating] = useState(0);
+    const [hover, setHover] = useState(0);
+    const [comments, setComments] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      if (rating === 0) {
+        toast.error('Please select a rating');
+        return;
+      }
+      setSubmitting(true);
+      try {
+        await onSubmit(complaint.complaint_id, rating, comments);
+        toast.success('Thank you for your feedback!');
+        onClose();
+      } catch (error) {
+        toast.error('Failed to submit feedback');
+      } finally {
+        setSubmitting(false);
+      }
+    };
+
+    return (
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm"
+      >
+        <motion.div 
+          initial={{ scale: 0.9, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
+          exit={{ scale: 0.9, y: 20 }}
+          className="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500"></div>
+          
+          <button 
+            onClick={onClose}
+            className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-900 transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-indigo-600 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Citizen Feedback Protocol</span>
+            </div>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tighter leading-none mb-2">How was the resolution?</h2>
+            <p className="text-slate-500 text-sm font-medium uppercase tracking-tighter">Regarding: {complaint.category}</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className="transition-transform active:scale-90"
+                    onMouseEnter={() => setHover(star)}
+                    onMouseLeave={() => setHover(0)}
+                    onClick={() => setRating(star)}
+                  >
+                    <Star 
+                      className={`w-10 h-10 ${
+                        star <= (hover || rating) 
+                          ? 'text-amber-400 fill-amber-400 scale-110' 
+                          : 'text-slate-200'
+                      } transition-all duration-300`}
+                    />
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                {rating === 1 ? 'Poor' : rating === 2 ? 'Fair' : rating === 3 ? 'Good' : rating === 4 ? 'Very Good' : rating === 5 ? 'Excellent' : 'Select a rating'}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Additional Intelligence</label>
+              <textarea
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+                placeholder="Tell us about the quality of the work done..."
+                className="w-full bg-slate-50 border-2 border-transparent focus:border-indigo-100 rounded-3xl px-6 py-4 text-sm font-medium outline-none transition-all placeholder:text-slate-400 min-h-[120px]"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full btn-premium py-5 flex items-center justify-center gap-4 text-sm font-black uppercase tracking-[0.2em]"
+            >
+              {submitting ? 'Submitting...' : 'Submit Experiences'}
+            </button>
+          </form>
+        </motion.div>
+      </motion.div>
+    );
   };
 
   return (
@@ -232,6 +351,38 @@ const Dashboard = () => {
                                 </div>
                               )}
                             </div>
+
+                            {/* Feedback Section */}
+                            {complaint.status === 'resolved' && (
+                              <div className="mt-8 pt-6 border-t border-slate-100/50 flex items-center justify-between">
+                                {complaint.feedback_rating ? (
+                                  <div className="flex items-center gap-4">
+                                    <div className="flex gap-1">
+                                      {[...Array(5)].map((_, i) => (
+                                        <Star 
+                                          key={i} 
+                                          className={`w-3.5 h-3.5 ${i < complaint.feedback_rating ? 'text-amber-400 fill-amber-400' : 'text-slate-200'}`} 
+                                        />
+                                      ))}
+                                    </div>
+                                    <p className="text-[10px] font-bold text-slate-400 italic">"{complaint.feedback_comments}"</p>
+                                  </div>
+                                ) : (
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => {
+                                      setSelectedComplaint(complaint);
+                                      setShowFeedbackModal(true);
+                                    }}
+                                    className="flex items-center gap-2 text-indigo-600 text-[10px] font-black uppercase tracking-widest hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all"
+                                  >
+                                    <MessageSquare className="w-3.5 h-3.5" />
+                                    Provide Resolution Feedback
+                                  </motion.button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </motion.div>
@@ -294,6 +445,16 @@ const Dashboard = () => {
           </motion.div>
         </div>
       </div>
+      
+      <AnimatePresence>
+        {showFeedbackModal && selectedComplaint && (
+          <FeedbackModal 
+            complaint={selectedComplaint} 
+            onClose={() => setShowFeedbackModal(false)}
+            onSubmit={handleFeedbackSubmit}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

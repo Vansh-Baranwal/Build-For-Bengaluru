@@ -129,6 +129,16 @@ router.get('/news', complaintController.getCityNews);
  * Community Validation Routes
  */
 router.get('/complaints-nearby', authMiddleware, complaintController.getNearbyComplaints);
-router.post('/complaints/:id/verify', authMiddleware, complaintController.verifyComplaint);
+/**
+ * POST /api/complaints/:id/feedback
+ * Submit feedback for a resolved complaint
+ */
+router.post(
+  '/complaints/:id/feedback',
+  authMiddleware,
+  validateComplaintId,
+  handleValidationErrors,
+  complaintController.submitFeedback
+);
 
 module.exports = router;

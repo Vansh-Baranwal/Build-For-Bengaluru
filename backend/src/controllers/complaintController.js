@@ -409,6 +409,8 @@ async function getMyComplaints(req, res, next) {
         image_url,
         deadline,
         is_escalated,
+        feedback_rating,
+        feedback_comments,
         ST_Y(location::geometry) as latitude,
         ST_X(location::geometry) as longitude,
         created_at,
@@ -551,6 +553,55 @@ async function verifyComplaint(req, res, next) {
   }
 }
 
+async function submitFeedback(req, res, next) {
+  const { id } = req.params;
+  const { rating, comments } = req.body;
+  const user_id = req.user.user_id;
+
+  try {
+    // 1. Verify that the complaint belongs to the user and is resolved
+    const complaintResult = await db.query(
+      'SELECT status, user_id FROM complaints WHERE complaint_id = $1',
+      [id]
+    );
+
+    if (complaintResult.rows.length === 0) {
+      return next(new NotFoundError(`Complaint with ID ${id} does not exist`));
+    }
+
+    const complaint = complaintResult.rows[0];
+
+    if (complaint.user_id !== user_id) {
+      return res.status(403).json({ error: 'Unauthorized: You can only provide feedback for your own complaints' });
+    }
+
+    if (complaint.status !== 'resolved') {
+      return res.status(400).json({ error: 'Feedback can only be provided for resolved complaints' });
+    }
+
+    // 2. Update the feedback
+    const updateQuery = `
+      UPDATE complaints
+      SET feedback_rating = $1,
+          feedback_comments = $2,
+          updated_at = NOW()
+      WHERE complaint_id = $3
+      RETURNING complaint_id, feedback_rating, feedback_comments
+    `;
+
+    const result = await db.query(updateQuery, [rating, comments, id]);
+    
+    res.status(200).json({
+      message: 'Feedback submitted successfully',
+      feedback: result.rows[0]
+    });
+
+  } catch (error) {
+    logger.error({ error, complaint_id: id }, 'Error submitting feedback');
+    return next(new DatabaseError('Failed to submit feedback'));
+  }
+}
+
 module.exports = {
   createComplaint,
   getComplaint,
@@ -561,5 +612,6 @@ module.exports = {
   getHeatmapData,
   getCityNews,
   getNearbyComplaints,
-  verifyComplaint
+  verifyComplaint,
+  submitFeedback
 };
